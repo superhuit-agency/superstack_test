@@ -64,6 +64,7 @@ type FetchApiFuncType = (
 		auth?: AuthType;
 		endpoint?: string;
 		headers?: any;
+		cache?: RequestCache;
 	}
 ) => Promise<any>;
 
