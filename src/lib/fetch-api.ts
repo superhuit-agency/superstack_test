@@ -82,19 +82,19 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 
 		(Array.isArray(errors) ? errors : [errors]).map((err) =>
 			console.error(`
-				${limit}
-				GraphQl API error
-				${sep}
-				== date:\t  ${new Date().toISOString()}
-				== endpoint: ${endpoint}
-				== query:
-					- name:       ${name}
-					- variables:  ${vars ?? '-'}
-					- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
-				== error:
-				${err.message}
-				${limit}
-			`)
+${limit}
+GraphQl API error
+${sep}
+== date:\t  ${new Date().toISOString()}
+== endpoint: ${endpoint}
+== query:
+	- name:       ${name}
+	- variables:  ${vars ?? '-'}
+	- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
+== error:
+${err.message}
+${limit}
+`)
 		);
 	}
 
