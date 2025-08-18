@@ -91,6 +91,9 @@ jobs:
 
       - name: Build Next Frontend
         uses: ./.github/actions/build-frontend
+        with:
+          # TODO: Remove this once the @wordpress packages are updated to support React 19
+          legacy-peer-deps: true
 
       - name: Start Next as a thread
         shell: bash

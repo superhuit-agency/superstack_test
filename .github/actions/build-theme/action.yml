@@ -1,4 +1,10 @@
 name: 'Build WP theme'
+inputs:
+  legacy-peer-deps:
+    description: 'Install node dependencies with legacy peer dependencies'
+    required: true
+    default: 'false'
+
 runs:
   using: 'composite'
   steps:
@@ -7,7 +13,15 @@ runs:
       with:
         node-version: 22
 
+    - name: Install node dependencies (legacy)
+      if: inputs.legacy-peer-deps == 'true'
+      shell: bash
+      run: |
+        npm install --frozen-lockfile --legacy-peer-deps
+        npm --prefix ./wordpress install --frozen-lockfile --legacy-peer-deps
+
     - name: Install node dependencies
+      if: inputs.legacy-peer-deps != 'true'
       shell: bash
       run: |
         npm install --frozen-lockfile
