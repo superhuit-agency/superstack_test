@@ -21,6 +21,10 @@ inputs:
     description: 'Next environment: local, development (default), staging or production'
     required: false
     default: 'development'
+  legacy-peer-deps:
+    description: 'Install node dependencies with legacy peer dependencies'
+    required: true
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -30,7 +34,13 @@ runs:
       with:
         node-version: 22
 
+    - name: Install node dependencies (legacy)
+      if: inputs.legacy-peer-deps == 'true'
+      shell: bash
+      run: npm ci --legacy-peer-deps
+
     - name: Install node dependencies
+      if: inputs.legacy-peer-deps != 'true'
       shell: bash
       run: npm ci
 
