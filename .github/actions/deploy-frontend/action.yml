@@ -21,6 +21,9 @@ inputs:
     description: 'Next environment: local, development (default), staging or production'
     required: false
     default: 'development'
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
   legacy-peer-deps:
     description: 'Install node dependencies with legacy peer dependencies'
     required: true
@@ -50,7 +53,7 @@ runs:
 
     - name: Build Next
       shell: bash
-      run: NODE_ENV=production npm run build
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NODE_ENV=production npm run build
 
     - name: Deploy Next files
       uses: easingthemes/ssh-deploy@main
