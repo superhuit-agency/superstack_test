@@ -18,7 +18,7 @@ declare global {
 			};
 	}
 
-	type PostType = 'page' | 'post' | 'form';
+	type PostType = 'page' | 'post' | 'form' | 'wp_block';
 
 	interface WpBlockEditProps<T>
 		extends Omit<BlockEditProps<T>, 'attributes'> {
@@ -78,6 +78,7 @@ declare global {
 			auth?: AuthType;
 			endpoint?: string;
 			headers?: any;
+			cache?: RequestCache;
 		}
 	) => Promise<any>;
 
@@ -106,10 +107,10 @@ declare global {
 
 	interface SectionProps extends SectionAttributes, BlockProps {}
 
-	type NextLayoutParams = {
+	type NextParams = Promise<{
 		uri: string[];
 		lang: Locale;
-	};
+	}>;
 
 	type TestableComponentMeta<T> = Meta<T> & {
 		blockConfig: BlockConfigs;

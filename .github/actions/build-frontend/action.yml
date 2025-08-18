@@ -1,11 +1,17 @@
 name: 'Build Frontend'
+inputs:
+  legacy-peer-deps:
+    description: 'Install node dependencies with legacy peer dependencies'
+    required: true
+    default: 'true'
+
 runs:
   using: 'composite'
   steps:
     - name: Install node
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
 
     - name: Install node dependencies
       shell: bash
