@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 - 2025-08-18
+
+-   Added back the Vercel deployment github action.
+-   Reverted unused deprecated package.
+-   Fixed readme file
+
 ## 1.1.0 - 2025-07-28: Automated tests with Jest
 
 Automated tests added using the `npm run test:all` command. Jest packages were added and configured.
