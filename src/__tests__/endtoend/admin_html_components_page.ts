@@ -13,6 +13,7 @@ import {
 	setRightPanel,
 	writeBlockHTML,
 } from '../utils/admin-manipulation';
+import * as AllComponentsTests from '@/components/test';
 
 const puppeteer = require('puppeteer');
 
@@ -22,7 +23,7 @@ const WORDPRESS_ADMIN_PASSWORD =
 const WORDPRESS_URL = process.env.WORDPRESS_URL || 'http://localhost';
 const NEXT_URL = process.env.NEXT_URL || 'http://localhost:3000';
 
-describe('Admin: Create a page to test all the blocks', () => {
+describe('Admin: Create a new post to test all the blocks', () => {
 	let browser: Browser;
 	let page: Page;
 	let videoRecorder: VideoRecorder;
@@ -65,8 +66,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.setViewport({ width: 960, height: 800 });
 
 		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('admin_full_page_cycle');
-		await videoRecorder.startRecording(page);
+		videoRecorder = new VideoRecorder('admin_full_page_cycle', page);
+		await videoRecorder.start();
 	});
 
 	beforeEach(async () => {
@@ -86,7 +87,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should open the admin to create a new page', async () => {
 		// Go to the admin page to create a new page
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=page`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
 		);
 	});
 
@@ -97,33 +98,26 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should type a page title', async () => {
 		await page.type(
 			'.wp-block-post-title .components-textarea-control__input',
-			`Test Page ${test_id}`,
+			`Test Post ${test_id}`,
 			{ delay: 100 }
 		);
 	});
 
-	it('should add the HTML to the page', async () => {
+	it('should add the HTML to the post', async () => {
 		// Find the main HTML TextArea
 		let allComponentsHTML = '';
 		await page.waitForSelector('textarea.editor-post-text-editor', {
 			timeout: 5000,
 		});
-		for (const blockStory of AllTestableComponents) {
-			let blockClassName = blockStory.blockConfig.slug ?? '';
+		for (const componentTests of Object.values(AllComponentsTests)) {
+			let blockClassName = componentTests.block.slug ?? '';
 
-			for (const testableStory of blockStory.getUnitTests() as TestableStory<any>[]) {
+			Object.values(componentTests.tests).forEach((testableStory) => {
 				allComponentsHTML += writeBlockHTML(
 					blockClassName,
 					testableStory.args
 				);
-				// await page.type(
-				// 	'textarea.editor-post-text-editor',
-				// 	await writeBlockHTML(blockClassName, testableStory.args),
-				// 	{
-				// 		delay: 0,
-				// 	}
-				// );
-			}
+			});
 		}
 		// Change the HTML in the textarea
 		await page.evaluate((html) => {
@@ -139,7 +133,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.keyboard.press('Enter');
 	});
 
-	it('should save the page as draft', async () => {
+	it('should save the post as draft', async () => {
 		// Find the "Save Draft" button
 		await page.waitForSelector(
 			'.components-button.editor-post-save-draft',
@@ -175,7 +169,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await setRightPanel(page, true);
 	});
 
-	it('should define a slug for the page', async () => {
+	it('should define a slug for the post', async () => {
 		// Find the "Slug" input
 		await page.waitForSelector(
 			'.components-button.editor-post-url__panel-toggle',
@@ -205,7 +199,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		);
 	});
 
-	it('should save the page as published', async () => {
+	it('should save the post as published', async () => {
 		// Find the "Publish" button
 		await page.waitForSelector(
 			'.components-button.editor-post-publish-button__button',
@@ -229,8 +223,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.waitForSelector('.components-snackbar', { timeout: 10000 });
 	});
 
-	it('should visit the page and be a HTTP 200', async () => {
-		// Go to the page
+	it('should visit the post and be a HTTP 200', async () => {
+		// Go to the post
 		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
 		// Wait for the page to load
 		await page.waitForNavigation({ timeout: 10000 });
@@ -242,12 +236,11 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	afterAll(async () => {
 		// Stop video recording
-		if (videoRecorder) {
-			const videoPath = await videoRecorder.stopRecording();
-			if (videoPath) {
-				console.log(`Video log saved: ${videoPath}`);
-			}
-			videoRecorder.cleanup();
+		const videoFile = await videoRecorder?.stop();
+		if (videoFile) {
+			console.log(
+				`📹 Complete test suite video saved: ${videoFile.filePath} (${videoFile.fileSize} bytes)`
+			);
 		}
 
 		await browser.close();

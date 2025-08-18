@@ -5,7 +5,7 @@
 
 import { Browser } from 'puppeteer';
 import { Page } from 'puppeteer';
-import { Stories as AllTestableComponents } from '@/components/stories';
+import * as AllComponentsTests from '@/components/test';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
 	doLoginIfNeeded,
@@ -64,8 +64,11 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.setViewport({ width: 960, height: 800 });
 
 		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('admin_create_empty_components');
-		await videoRecorder.startRecording(page);
+		videoRecorder = new VideoRecorder(
+			'admin_create_empty_components',
+			page
+		);
+		await videoRecorder.start();
 	});
 
 	beforeEach(async () => {
@@ -82,10 +85,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 		);
 	});
 
-	it('should open the admin to create a new page', async () => {
-		// Go to the admin page to create a new page
+	it('should open the admin to create a new post', async () => {
+		// Go to the admin page to create a new post
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=page`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
 		);
 	});
 
@@ -95,12 +98,12 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await setCodeEditor(page, false);
 	});
 
-	for (const blockStory of AllTestableComponents) {
-		let blockTitle = blockStory.blockConfig.title ?? '';
-		let blockSlug = blockStory.blockConfig.slug ?? '';
+	Object.values(AllComponentsTests).forEach((componentTests) => {
+		let blockTitle = componentTests.block.title ?? '';
+		let blockSlug = componentTests.block.slug ?? '';
 		let blockClassName = blockSlug.replace('core/', '').replace(/\//g, '-');
 
-		it('should add the ' + blockTitle + ' block to the page', async () => {
+		it('should add the ' + blockTitle + ' block to the post', async () => {
 			// Find the "+" button on the top left of the page
 			await page.waitForSelector(
 				'button.components-button.editor-document-tools__inserter-toggle',
@@ -141,7 +144,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 				})
 				.catch((err) => {
 					console.log(
-						`Block ${blockTitle} (${blockSlug}) could not be added to the page`
+						`Block ${blockTitle} (${blockSlug}) could not be added to the post`
 					);
 				});
 			// Close the Blocks inserter panel
@@ -149,9 +152,9 @@ describe('Admin: Create a page to test all the blocks', () => {
 				'.components-button.editor-document-tools__inserter-toggle.is-pressed'
 			);
 		});
-	}
+	});
 
-	it('should save the page as draft', async () => {
+	it('should save the post as draft', async () => {
 		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(
@@ -180,12 +183,11 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	afterAll(async () => {
 		// Stop video recording
-		if (videoRecorder) {
-			const videoPath = await videoRecorder.stopRecording();
-			if (videoPath) {
-				console.log(`Video log saved: ${videoPath}`);
-			}
-			videoRecorder.cleanup();
+		const videoFile = await videoRecorder?.stop();
+		if (videoFile) {
+			console.log(
+				`📹 Complete test suite video saved: ${videoFile.filePath} (${videoFile.fileSize} bytes)`
+			);
 		}
 
 		await browser.close();

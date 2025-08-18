@@ -32,11 +32,11 @@ runs:
 
     - name: Install node dependencies
       shell: bash
-      run: npm ci --legacy-peer-deps
+      run: npm ci
 
     - name: Copy environment file
       shell: bash
-      run: cp .env.next.${{ inputs.NEXT_ENV }}.example .env
+      run: cp .env.next.example .env
 
     - name: Build Next
       shell: bash
