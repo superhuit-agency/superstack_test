@@ -33,7 +33,7 @@ runs:
 
     - name: Install dependencies for jest + puppeteer
       shell: bash
-      run: npm ci
+      run: npm ci --legacy-peer-deps
 
     - name: Install Puppeteer dependencies
       shell: bash
@@ -61,6 +61,11 @@ runs:
       run: |
         google-chrome --version
         which google-chrome
+
+    - name: prepare video logs folder
+      shell: bash
+      run: |
+        mkdir -p src/__tests__/video-logs/
 
     - name: Run all tests
       shell: bash
