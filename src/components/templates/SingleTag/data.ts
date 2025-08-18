@@ -119,7 +119,7 @@ export const getData = async (
 				{ posts, categories, tags, currentPage: pageNum },
 				node
 			).archivePage,
-			baseUri: readingSettings.postsPage.uri,
+			baseUri: readingSettings.postsPage?.uri,
 		},
 	};
 };
