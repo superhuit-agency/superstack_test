@@ -13,11 +13,11 @@ export const setOptionsPanel = async (page: Page, activate: boolean) => {
 		return;
 	}
 	await page.waitForSelector(
-		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle), .edit-post-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle),',
+		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle), .edit-post-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle)',
 		{ timeout: 1000 }
 	);
 	await page.click(
-		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle), .edit-post-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle),'
+		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle), .edit-post-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle)'
 	);
 };
 

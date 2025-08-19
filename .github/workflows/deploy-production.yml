@@ -72,6 +72,9 @@ jobs:
 
       - name: Build Theme
         uses: ./.github/actions/build-theme
+        with:
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
 
       - name: Deploy Theme
         uses: ./.github/actions/deploy-theme
