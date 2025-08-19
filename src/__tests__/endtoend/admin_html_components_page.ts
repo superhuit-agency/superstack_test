@@ -209,12 +209,12 @@ describe('Admin: Create a new post to test all the blocks', () => {
 		await page.click(
 			'.components-button.editor-post-publish-button__button'
 		);
-		await new Promise((resolve) => setTimeout(resolve, 250));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 		// Twice !
 		await page.click(
 			'.components-button.editor-post-publish-button.editor-post-publish-button__button'
 		);
-		await new Promise((resolve) => setTimeout(resolve, 250));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 	});
 
 	it('should see the success message in the snackbar', async () => {
@@ -224,15 +224,17 @@ describe('Admin: Create a new post to test all the blocks', () => {
 			{ timeout: 5000 }
 		);
 
-		// Click on the "View Post" button
-		await page.click(
-			'.components-snackbar .components-button.components-snackbar__action'
-		);
-		// Wait for the page to load
-		const response = await page.waitForNavigation({
-			timeout: 10000,
-			waitUntil: 'networkidle0',
-		});
+		const [response, _] = await Promise.all([
+			// Wait for the page to load
+			page.waitForNavigation({
+				timeout: 10000,
+				waitUntil: 'load',
+			}),
+			// Click on the "View Post" button
+			page.click(
+				'.components-snackbar .components-button.components-snackbar__action'
+			),
+		]);
 
 		// Check the response status
 		expect(response?.status()).toBe(200);
