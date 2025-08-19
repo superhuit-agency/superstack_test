@@ -229,14 +229,8 @@ describe('Admin: Create a new post to test all the blocks', () => {
 			'.components-snackbar .components-button.components-snackbar__action'
 		);
 		// Wait for the page to load
-		await page.waitForNavigation({ timeout: 10000 });
-	});
+		const response = await page.waitForNavigation({ timeout: 10000 });
 
-	it('should visit the post and be a HTTP 200', async () => {
-		// Go to the post
-		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
-		// Wait for the page to load
-		await page.waitForNavigation({ timeout: 10000 });
 		// Check the response status
 		expect(response?.status()).toBe(200);
 		// Give a second to any human eye looking at this test execution.
