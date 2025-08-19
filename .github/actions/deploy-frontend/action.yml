@@ -47,14 +47,13 @@ runs:
       shell: bash
       run: npm ci
 
-    # copy file if it doesn't exist
     - name: Copy environment file
       shell: bash
       run: cp .env.next.example .env
 
     - name: Build Next
       shell: bash
-      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NODE_ENV=production npm run build
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} NODE_ENV=production npm run build
 
     - name: Deploy Next environment file (if does not exist)
       uses: easingthemes/ssh-deploy@main
