@@ -220,8 +220,8 @@ describe('Admin: Create a new post to test all the blocks', () => {
 	it('should see the success message in the snackbar', async () => {
 		// Find the success message
 		await page.waitForSelector(
-			'.components-snackbar .components-snackbar__content',
-			{ timeout: 10000 }
+			'.components-snackbar .components-button.components-snackbar__action',
+			{ timeout: 5000 }
 		);
 
 		// Click on the "View Post" button
