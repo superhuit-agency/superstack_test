@@ -89,10 +89,27 @@ export const doLoginIfNeeded = async (
 		// Find the password input and type the password
 		await page.waitForSelector('#user_pass', { timeout: 5000 });
 		await page.type('#user_pass', password);
+		await new Promise((resolve) => setTimeout(resolve, 250));
 		// Find the login button and click it
 		await page.click('#wp-submit', { delay: 100 });
 		// Wait for the page to load
-		await page.waitForNavigation({ timeout: 10000 });
+		await page.waitForNavigation({ timeout: 10000 }).catch(async () => {
+			if (url.includes('wp-login.php')) {
+				// Find the username input and type the username
+				await page.waitForSelector('#user_login', { timeout: 5000 });
+				// Needed to avoid race condition
+				await new Promise((resolve) => setTimeout(resolve, 250));
+				await page.type('#user_login', username);
+				// Find the password input and type the password
+				await page.waitForSelector('#user_pass', { timeout: 5000 });
+				await page.type('#user_pass', password);
+				await new Promise((resolve) => setTimeout(resolve, 250));
+				// Find the login button and click it
+				await page.click('#wp-submit', { delay: 100 });
+				// Wait for the page to load
+				await page.waitForNavigation({ timeout: 10000 });
+			}
+		});
 	}
 };
 
