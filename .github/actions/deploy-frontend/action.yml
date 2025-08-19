@@ -21,6 +21,9 @@ inputs:
     description: 'Next environment: local, development (default), staging or production'
     required: false
     default: 'development'
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
   WORDPRESS_URL:
     description: 'WordPress URL'
     required: true

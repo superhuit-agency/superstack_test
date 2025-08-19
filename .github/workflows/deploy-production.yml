@@ -117,6 +117,11 @@ jobs:
             WORDPRESS_PATH=${{ vars.WORDPRESS_PATH }} \
             /bin/bash -s " < ./wordpress/scripts/provision.sh
 
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
+        with:
+          legacy-peer-deps: true
+
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-frontend
         with:
@@ -127,6 +132,7 @@ jobs:
           NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
           NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
 
   deploy_frontend_using_vercel:
     name: Deploy frontend to Vercel (production)
@@ -171,3 +177,4 @@ jobs:
           NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
           NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
