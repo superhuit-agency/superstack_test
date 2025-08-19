@@ -200,11 +200,6 @@ describe('Admin: Create a new post to test all the blocks', () => {
 	});
 
 	it('should save the post as published', async () => {
-		// Wait for any notification to disappear
-		await page.waitForSelector(
-			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
-			{ timeout: 5000, hidden: true }
-		);
 		// Find the "Publish" button
 		await page.waitForSelector(
 			'.components-button.editor-post-publish-button__button',
@@ -224,8 +219,10 @@ describe('Admin: Create a new post to test all the blocks', () => {
 
 	it('should see the success message in the snackbar', async () => {
 		// Find the success message
-		// <div class="components-snackbar" tabindex="0" role="button" aria-label="Dismiss this notice"><div class="components-snackbar__content">Page updated.<a href="/347-2/" class="components-button components-snackbar__action is-tertiary">View Page</a></div></div>
-		await page.waitForSelector('.components-snackbar', { timeout: 10000 });
+		await page.waitForSelector(
+			'.components-snackbar .components-snackbar__content',
+			{ timeout: 10000 }
+		);
 
 		// Click on the "View Post" button
 		await page.click(
