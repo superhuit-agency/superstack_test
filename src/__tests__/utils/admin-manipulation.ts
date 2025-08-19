@@ -13,11 +13,11 @@ export const setOptionsPanel = async (page: Page, activate: boolean) => {
 		return;
 	}
 	await page.waitForSelector(
-		'.interface-more-menu-dropdown .components-button.components-dropdown-menu__toggle',
+		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle)',
 		{ timeout: 1000 }
 	);
 	await page.click(
-		'.interface-more-menu-dropdown .components-button.components-dropdown-menu__toggle'
+		'.editor-header__settings .components-button.components-dropdown-menu__toggle:not(.editor-preview-dropdown__toggle)'
 	);
 };
 
@@ -31,11 +31,11 @@ export const setCodeEditor = async (page: Page, activate: boolean) => {
 	await new Promise((resolve) => setTimeout(resolve, 250));
 	// Code Editor is on if we can find the editor toolbar ("exit code editor")
 	let isOn = await page.evaluate(
-		() => document.querySelector('.edit-post-text-editor__toolbar') != null
+		() => document.querySelector('.editor-text-editor__toolbar') != null
 	);
 	if (isOn && !activate) {
 		// click on the editor toolbar
-		await page.click('.edit-post-text-editor__toolbar .components-button', {
+		await page.click('.editor-text-editor__toolbar .components-button', {
 			delay: 100,
 		});
 	} else if (!isOn && activate) {
@@ -45,7 +45,7 @@ export const setCodeEditor = async (page: Page, activate: boolean) => {
 		await page.evaluate(() => {
 			let label = document
 				.querySelectorAll(
-					'.interface-more-menu-dropdown__content button>span.components-menu-item__item'
+					'.components-dropdown-menu__menu button>span.components-menu-item__item'
 				)
 				.values()
 				.find(
@@ -90,7 +90,7 @@ export const doLoginIfNeeded = async (
 		await page.waitForSelector('#user_pass', { timeout: 5000 });
 		await page.type('#user_pass', password);
 		// Find the login button and click it
-		await page.click('#wp-submit');
+		await page.click('#wp-submit', { delay: 100 });
 		// Wait for the page to load
 		await page.waitForNavigation({ timeout: 10000 });
 	}

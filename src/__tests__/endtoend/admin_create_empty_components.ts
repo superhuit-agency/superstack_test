@@ -98,38 +98,41 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await setCodeEditor(page, false);
 	});
 
+	it('should open the blocks inserter', async () => {
+		// Find the "+" button on the top left of the page
+		await page.waitForSelector(
+			'button.components-button.editor-document-tools__inserter-toggle',
+			{ timeout: 5000 }
+		);
+		// Click on the "+" button
+		await page.click(
+			'button.components-button.editor-document-tools__inserter-toggle',
+			{
+				delay: 100,
+			}
+		);
+	});
+
 	Object.values(AllComponentsTests).forEach((componentTests) => {
 		let blockTitle = componentTests.block.title ?? '';
 		let blockSlug = componentTests.block.slug ?? '';
 		let blockClassName = blockSlug.replace('core/', '').replace(/\//g, '-');
 
 		it('should add the ' + blockTitle + ' block to the post', async () => {
-			// Find the "+" button on the top left of the page
-			await page.waitForSelector(
-				'button.components-button.editor-document-tools__inserter-toggle',
-				{ timeout: 5000 }
-			);
-			// Click on the "+" button
-			await page.click(
-				'button.components-button.editor-document-tools__inserter-toggle',
-				{
-					delay: 100,
-				}
-			);
-			// Find the "Search input" in the inserter
-			await page.waitForSelector('input.components-input-control__input');
-			// Type the block name in the search input
-			await page.type(
-				'input.components-input-control__input',
-				blockTitle
-			);
-			// Wait and find the first component in the list
+			// // Find the "Search input" in the inserter
+			// await page.waitForSelector('input.components-input-control__input');
+			// // Type the block name in the search input
+			// await page.type(
+			// 	'input.components-input-control__input',
+			// 	blockTitle
+			// );
+			// Wait and find the component in the list
 			await page
 				.waitForSelector(
 					'.block-editor-block-types-list button.editor-block-list-item-' +
 						blockClassName,
 					{
-						timeout: 500,
+						timeout: 1000,
 					}
 				)
 				.then(async (block) => {
@@ -138,7 +141,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 						'.block-editor-block-types-list button.editor-block-list-item-' +
 							blockClassName,
 						{
-							delay: 100,
+							delay: 500,
 						}
 					);
 				})
@@ -147,14 +150,22 @@ describe('Admin: Create a page to test all the blocks', () => {
 						`Block ${blockTitle} (${blockSlug}) could not be added to the post`
 					);
 				});
-			// Close the Blocks inserter panel
-			await page.click(
-				'.components-button.editor-document-tools__inserter-toggle.is-pressed'
-			);
 		});
 	});
 
+	it('should close the blocks inserter', async () => {
+		// Close the Blocks inserter panel
+		await page.click(
+			'.components-button.editor-document-tools__inserter-toggle.is-pressed'
+		);
+	});
+
 	it('should save the post as draft', async () => {
+		// Wait for any notification to disappear
+		await page.waitForSelector(
+			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
+			{ timeout: 5000, hidden: true }
+		);
 		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(

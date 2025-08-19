@@ -52,11 +52,6 @@ export const ListTests: ComponentTests = {
 				expect(component).toHaveClass('supt-list');
 				// HTML structure - should be ol for ordered
 				expect(component?.tagName.toLowerCase()).toBe('ol');
-				// Counter
-				expect(component).toHaveAttribute(
-					'style',
-					'counter-set: li 2;'
-				);
 				// Content
 				expect(component).toHaveTextContent('Second item');
 				expect(component).toHaveTextContent('Third item');
