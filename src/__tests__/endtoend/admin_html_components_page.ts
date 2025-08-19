@@ -229,7 +229,10 @@ describe('Admin: Create a new post to test all the blocks', () => {
 			'.components-snackbar .components-button.components-snackbar__action'
 		);
 		// Wait for the page to load
-		const response = await page.waitForNavigation({ timeout: 10000 });
+		const response = await page.waitForNavigation({
+			timeout: 10000,
+			waitUntil: 'networkidle0',
+		});
 
 		// Check the response status
 		expect(response?.status()).toBe(200);
