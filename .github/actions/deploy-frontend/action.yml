@@ -47,9 +47,13 @@ runs:
       shell: bash
       run: npm ci
 
+    # copy file if it doesn't exist
     - name: Copy environment file
       shell: bash
-      run: cp .env.next.example .env
+      run: |
+        if [ ! -f .env ]; then
+          cp .env.next.example .env
+        fi
 
     - name: Build Next
       shell: bash
