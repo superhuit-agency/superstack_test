@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 - 2025-08-20
+
+- [ecaabe8](https://github.com/superhuit-agency/superstack_test/commit/ecaabe8ca3a2232bcd073494dbe5b26f4f6bd410) Merge remote-tracking branch 'remote/release/v1.1.0' (geck1942)
+
+
 ## 1.2.0 - 2025-08-18: Update to WP 6.8 + Next 15 + React 19 + Node 22
 
 This major update brings significant version upgrades across the entire stack, ensuring compatibility with the latest technologies while maintaining stability and performance.
