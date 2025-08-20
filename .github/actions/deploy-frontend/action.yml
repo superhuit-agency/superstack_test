@@ -21,6 +21,9 @@ inputs:
     description: 'Next environment: local, development (default), staging or production'
     required: false
     default: 'development'
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
   WORDPRESS_URL:
     description: 'WordPress URL'
     required: true
@@ -47,17 +50,24 @@ runs:
       shell: bash
       run: npm ci
 
-    # copy file if it doesn't exist
     - name: Copy environment file
       shell: bash
-      run: |
-        if [ ! -f .env ]; then
-          cp .env.next.example .env
-        fi
+      run: cp .env.next.example .env
 
     - name: Build Next
       shell: bash
-      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NODE_ENV=production npm run build
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} NODE_ENV=production npm run build
+
+    - name: Deploy Next environment file (if does not exist)
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.NEXT_SSH_PRIVATE_KEY }}
+        REMOTE_USER: ${{ inputs.NEXT_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.NEXT_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.NEXT_SSH_PORT }}
+        ARGS: -aulrqtvz --ignore-existing
+        SOURCE: .env
+        TARGET: ${{ inputs.NEXT_SSH_PATH }}/.env
 
     - name: Deploy Next files
       uses: easingthemes/ssh-deploy@main
@@ -69,7 +79,7 @@ runs:
         ARGS: -aulrqtvz
         SOURCE: .
         TARGET: ${{ inputs.NEXT_SSH_PATH }}
-        EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.*.example, README.md, next-env.d.ts, vercel.json, wordpress'
+        EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env, .env.*.example, README.md, next-env.d.ts, vercel.json, wordpress'
 
     - name: Deploy WordPress files used by next
       uses: easingthemes/ssh-deploy@main

@@ -1,5 +1,11 @@
 name: 'Build WP theme'
 inputs:
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
   legacy-peer-deps:
     description: 'Install node dependencies with legacy peer dependencies'
     required: true
@@ -29,7 +35,7 @@ runs:
 
     - name: Build assets
       shell: bash
-      run: npm run build
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} npm run build
       working-directory: ./wordpress
 
     - name: Save built artifacts

@@ -209,23 +209,25 @@ describe('Admin: Create a new post to test all the blocks', () => {
 		await page.click(
 			'.components-button.editor-post-publish-button__button'
 		);
-		await new Promise((resolve) => setTimeout(resolve, 250));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 		// Twice !
 		await page.click(
 			'.components-button.editor-post-publish-button.editor-post-publish-button__button'
 		);
-		await new Promise((resolve) => setTimeout(resolve, 250));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 	});
 
 	it('should see the success message in the snackbar', async () => {
 		// Find the success message
-		// <div class="components-snackbar" tabindex="0" role="button" aria-label="Dismiss this notice"><div class="components-snackbar__content">Page updated.<a href="/347-2/" class="components-button components-snackbar__action is-tertiary">View Page</a></div></div>
-		await page.waitForSelector('.components-snackbar', { timeout: 10000 });
+		await page.waitForSelector(
+			'.components-snackbar .components-button.components-snackbar__action',
+			{ timeout: 5000 }
+		);
 	});
 
 	it('should visit the post and be a HTTP 200', async () => {
 		// Go to the post
-		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
+		const response = await page.goto(`${NEXT_URL}/blog/${test_id}/`);
 		// Wait for the page to load
 		await page.waitForNavigation({ timeout: 10000 });
 		// Check the response status
