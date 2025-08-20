@@ -31,13 +31,19 @@ export const setCodeEditor = async (page: Page, activate: boolean) => {
 	await new Promise((resolve) => setTimeout(resolve, 250));
 	// Code Editor is on if we can find the editor toolbar ("exit code editor")
 	let isOn = await page.evaluate(
-		() => document.querySelector('.editor-text-editor__toolbar') != null
+		() =>
+			document.querySelector(
+				'.editor-text-editor__toolbar, .edit-post-text-editor__toolbar'
+			) != null
 	);
 	if (isOn && !activate) {
 		// click on the editor toolbar
-		await page.click('.editor-text-editor__toolbar .components-button', {
-			delay: 100,
-		});
+		await page.click(
+			'.editor-text-editor__toolbar button, .edit-post-text-editor__toolbar button',
+			{
+				delay: 100,
+			}
+		);
 	} else if (!isOn && activate) {
 		await setOptionsPanel(page, true);
 		// Find the option command that says "Code Editor" using XPATH
