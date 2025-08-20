@@ -105,7 +105,7 @@ jobs:
         run: |
           nohup npm run start -- -p 3000 > next.log 2>&1 &
           echo "Waiting for Next.js to be ready..."
-          timeout=60
+          timeout=20
           while ! curl -s http://localhost:3000/ > /dev/null; do
             if [ $timeout -le 0 ]; then
               echo "Timeout waiting for Next.js. Log content:"
@@ -113,8 +113,8 @@ jobs:
               exit 0
             fi
             echo "Waiting... ($timeout seconds remaining)"
-            sleep 10
-            timeout=$((timeout-10))
+            sleep 5
+            timeout=$((timeout-5))
           done
 
       - name: Simple HTTP Test
