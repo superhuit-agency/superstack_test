@@ -31,7 +31,7 @@ export async function generateStaticParams() {
 export async function generateMetadata(props: {
 	params: NextParams;
 }): Promise<Metadata> {
-	const params = await props.params;
+	const params = (await props.params) ?? {};
 
 	const uri = getWpUriFromNextPath(params.uri ?? []);
 
@@ -132,7 +132,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function Page(props: { params: NextParams }) {
-	const params = await props.params;
+	const params = (await props.params) ?? {};
 
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 

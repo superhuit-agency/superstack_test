@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 import { Blocks, Container } from '@/components/global';
 import { SectionNews, Image } from '@/components';
 
@@ -93,7 +93,7 @@ export default function Post({ node }: any) {
 						uptitle={dictionary.post?.relatedNews}
 						seeAllLink={{
 							title: dictionary.post?.seeAll,
-							href: node?.postsPage.uri,
+							href: node?.postsPage?.uri,
 						}}
 						posts={node.relatedPosts}
 					/>

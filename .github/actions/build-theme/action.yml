@@ -1,4 +1,16 @@
 name: 'Build WP theme'
+inputs:
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
+  legacy-peer-deps:
+    description: 'Install node dependencies with legacy peer dependencies'
+    required: true
+    default: 'false'
+
 runs:
   using: 'composite'
   steps:
@@ -7,7 +19,15 @@ runs:
       with:
         node-version: 22
 
+    - name: Install node dependencies (legacy)
+      if: inputs.legacy-peer-deps == 'true'
+      shell: bash
+      run: |
+        npm install --frozen-lockfile --legacy-peer-deps
+        npm --prefix ./wordpress install --frozen-lockfile --legacy-peer-deps
+
     - name: Install node dependencies
+      if: inputs.legacy-peer-deps != 'true'
       shell: bash
       run: |
         npm install --frozen-lockfile
@@ -15,12 +35,8 @@ runs:
 
     - name: Build assets
       shell: bash
-      run: npm run build
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} npm run build
       working-directory: ./wordpress
-
-    # - name: Execute script to update translation file
-    #   shell: bash
-    #   run: sh ./.github/actions/build-theme/update-wp-translation-files.sh
 
     - name: Save built artifacts
       uses: actions/upload-artifact@v4

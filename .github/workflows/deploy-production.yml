@@ -1,33 +1,27 @@
-name: Deploy WP & Nextjs to Production - builds and deploys
+name: Deploy production branch
 on:
-  # ######## Uncomment below block to enable automatic deployment
-  # push:
-  #   branches:
-  #     - 'production'
-  #   # # Only run workflow if push a server tag
-  #   # tags:
-  #   #   - 'v*.*.*'
-  # ########
-
-  # Allows you to run this workflow manually from the Actions tab
+  push:
+    branches:
+      - 'main'
+      - 'master'
   workflow_dispatch:
 
 jobs:
-  should_deploy_wp:
+  deploy_backend:
+    name: Deploy backend in production environment
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' # If it's a pull request we don't want to deploy wordpress
-    outputs:
-      inputs_checked: ${{ steps.check_secrets.outputs.inputs_checked }}
-      should_deploy: ${{ steps.changed_files_wp.outputs.any_changed }}
-    steps:
-      - uses: styfle/cancel-workflow-action@0.12.1
-        with:
-          access_token: ${{ github.token }}
+    strategy:
+      matrix:
+        environment:
+          - production
 
-      - id: check_secrets
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check github environment secrets and variables
         run: |
+          echo "Checking secrets and variables for '${{ matrix.environment }}' environment..."
           missing_vars=0
-          for var in PRODUCTION_BE_SSH_USER PRODUCTION_BE_SSH_HOST PRODUCTION_BE_SSH_PORT SSH_PRIVATE_KEY PRODUCTION_WORDPRESS_PATH PRODUCTION_NEXT_URL WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
+          for var in COMPOSER_GITHUB_TOKEN RELEASE_BELT_USER RELEASE_BELT_PASSWORD WORDPRESS_SSH_HOST WORDPRESS_PATH WORDPRESS_SSH_PORT WORDPRESS_SSH_USER WORDPRESS_SSH_PRIVATE_KEY WORDPRESS_URL WORDPRESS_VERSION WORDPRESS_LOCALE WORDPRESS_THEME_NAME WORDPRESS_THEME_TITLE WORDPRESS_ADMIN_USER WORDPRESS_ADMIN_PASSWORD WORDPRESS_ADMIN_EMAIL WORDPRESS_DB_HOST WORDPRESS_DB_NAME WORDPRESS_DB_USER WORDPRESS_DB_PASSWORD NEXT_SSH_HOST NEXT_SSH_PATH NEXT_SSH_PORT NEXT_SSH_USER NEXT_SSH_PRIVATE_KEY NEXT_URL; do
             if [ -z "${!var}" ]; then
               echo "$var is not set."
               missing_vars=$((missing_vars+1))
@@ -43,57 +37,116 @@ jobs:
           else
             echo "inputs_checked=true" >> $GITHUB_OUTPUT
           fi
-        # uses: svrooij/secret-gate-action@v1.1
-        # with:
-        #   inputsToCheck: 'PRODUCTION_BE_SSH_USER,PRODUCTION_BE_SSH_HOST,PRODUCTION_BE_SSH_PORT,SSH_PRIVATE_KEY,PRODUCTION_WORDPRESS_PATH,PRODUCTION_NEXT_URL,WORDPRESS_THEME_NAME,RELEASE_BELT_USER,RELEASE_BELT_PWD'
         env:
-          PRODUCTION_BE_SSH_USER: ${{ secrets.PRODUCTION_BE_SSH_USER }}
-          PRODUCTION_BE_SSH_HOST: ${{ secrets.PRODUCTION_BE_SSH_HOST }}
-          PRODUCTION_BE_SSH_PORT: ${{ secrets.PRODUCTION_BE_SSH_PORT }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          PRODUCTION_WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
-          PRODUCTION_NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
-          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
-          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
-          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PASSWORD: ${{ secrets.RELEASE_BELT_PASSWORD }}
 
-      - uses: styfle/cancel-workflow-action@0.12.1
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          WORDPRESS_VERSION: ${{ vars.WORDPRESS_VERSION }}
+          WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_TITLE: ${{ vars.WORDPRESS_THEME_TITLE }}
+
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+          WORDPRESS_ADMIN_EMAIL: ${{ vars.WORDPRESS_ADMIN_EMAIL }}
+          WORDPRESS_DB_HOST: ${{ vars.WORDPRESS_DB_HOST }}
+          WORDPRESS_DB_NAME: ${{ vars.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ vars.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ secrets.WORDPRESS_DB_PASSWORD }}
+
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
         with:
-          access_token: ${{ github.token }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
 
-      - uses: actions/checkout@v4
+      - name: Deploy Theme
+        uses: ./.github/actions/deploy-theme
         with:
-          fetch-depth: 0
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
 
-      - id: changed_files_wp
-        if: steps.check_secrets.outputs.inputs_checked == 'true'
-        uses: tj-actions/changed-files@v44
+      - name: Deploy Composer
+        uses: easingthemes/ssh-deploy@main
         with:
-          since_last_remote_commit: 'true'
-          files: |
-            wordpress/**
+          SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          ARGS: '-raultzv --delete'
+          REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          REMOTE_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
+          TARGET: ${{ vars.WORDPRESS_PATH }}
 
-      - name: Set output
-        if: steps.check_secrets.outputs.inputs_checked == 'true'
-        run: echo "should_deploy=${{ steps.changed_files_wp.outputs.any_changed }}" >> $GITHUB_OUTPUT
+      - name: SSH Action
+        id: ssh
+        uses: kuuak/ssh-action@main
+        with:
+          SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          SSH_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
 
-  deploy_wp:
-    needs: should_deploy_wp
-    if: needs.should_deploy_wp.outputs.should_deploy == 'true'
-    uses: ./.github/workflows/deploy-wp.yml
-    secrets:
-      SSH_USER: ${{ secrets.PRODUCTION_BE_SSH_USER }}
-      SSH_HOST: ${{ secrets.PRODUCTION_BE_SSH_HOST }}
-      SSH_PORT: ${{ secrets.PRODUCTION_BE_SSH_PORT }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
-      NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
-      WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+      - name: Require composer depedencies
+        shell: bash
+        run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ vars.WORDPRESS_PATH }}; composer install --no-dev"
 
-  deploy_next:
+      - name: Execute provisiton script
+        shell: bash
+        run: |
+          ssh ${{ steps.ssh.outputs.SERVER }} \
+            "cd ${{ vars.WORDPRESS_PATH }}; \
+            env THEME_NAME=${{ vars.WORDPRESS_THEME_NAME }} \
+            NEXT_URL=${{ vars.NEXT_URL }} \
+            WORDPRESS_PATH=${{ vars.WORDPRESS_PATH }} \
+            /bin/bash -s " < ./wordpress/scripts/provision.sh
+
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
+        with:
+          legacy-peer-deps: true
+
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          NEXT_ENV: development
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+  deploy_frontend_using_vercel:
+    name: Deploy frontend to Vercel (production)
     runs-on: ubuntu-latest
-    needs: deploy_wp
-    if: ${{ always() }} # Always run the job regardless if build_deploy_wp was successful/skip or not
+    needs: deploy_backend
+    if: ${{ vars.VERCEL_PROJECT_ID != '' }}
+    strategy:
+      matrix:
+        environment:
+          - production
+
     steps:
       - uses: actions/checkout@v4
       - name: Deploy NextJS
@@ -101,7 +154,30 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ github.token }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
           GITHUB_DEPLOYMENT_ENV: Production
           PRODUCTION: true
+
+  deploy_frontend_using_ssh:
+    name: Deploy frontend using SSH (production)
+    runs-on: ubuntu-latest
+    needs: deploy_backend
+    if: ${{ vars.VERCEL_PROJECT_ID == '' }}
+    strategy:
+      matrix:
+        environment:
+          - production
+
+    steps:
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          NEXT_ENV: development
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}

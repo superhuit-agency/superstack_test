@@ -1,0 +1,177 @@
+name: Deploy staging branch
+on:
+  push:
+    branches:
+      - 'staging'
+  workflow_dispatch:
+
+jobs:
+  deploy_backend:
+    name: Deploy backend in staging environment
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment:
+          - staging
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check github environment secrets and variables
+        run: |
+          echo "Checking secrets and variables for '${{ matrix.environment }}' environment..."
+          missing_vars=0
+          for var in COMPOSER_GITHUB_TOKEN RELEASE_BELT_USER RELEASE_BELT_PASSWORD WORDPRESS_SSH_HOST WORDPRESS_PATH WORDPRESS_SSH_PORT WORDPRESS_SSH_USER WORDPRESS_SSH_PRIVATE_KEY WORDPRESS_URL WORDPRESS_VERSION WORDPRESS_LOCALE WORDPRESS_THEME_NAME WORDPRESS_THEME_TITLE WORDPRESS_ADMIN_USER WORDPRESS_ADMIN_PASSWORD WORDPRESS_ADMIN_EMAIL WORDPRESS_DB_HOST WORDPRESS_DB_NAME WORDPRESS_DB_USER WORDPRESS_DB_PASSWORD NEXT_SSH_HOST NEXT_SSH_PATH NEXT_SSH_PORT NEXT_SSH_USER NEXT_SSH_PRIVATE_KEY NEXT_URL; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PASSWORD: ${{ secrets.RELEASE_BELT_PASSWORD }}
+
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          WORDPRESS_VERSION: ${{ vars.WORDPRESS_VERSION }}
+          WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_TITLE: ${{ vars.WORDPRESS_THEME_TITLE }}
+
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+          WORDPRESS_ADMIN_EMAIL: ${{ vars.WORDPRESS_ADMIN_EMAIL }}
+          WORDPRESS_DB_HOST: ${{ vars.WORDPRESS_DB_HOST }}
+          WORDPRESS_DB_NAME: ${{ vars.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ vars.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ secrets.WORDPRESS_DB_PASSWORD }}
+
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
+        with:
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+      - name: Deploy Theme
+        uses: ./.github/actions/deploy-theme
+        with:
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+
+      - name: Deploy Composer
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          ARGS: '-raultzv --delete'
+          REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          REMOTE_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
+          TARGET: ${{ vars.WORDPRESS_PATH }}
+
+      - name: SSH Action
+        id: ssh
+        uses: kuuak/ssh-action@main
+        with:
+          SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          SSH_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+
+      - name: Require composer depedencies
+        shell: bash
+        run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ vars.WORDPRESS_PATH }}; composer install --no-dev"
+
+      - name: Execute provisiton script
+        shell: bash
+        run: |
+          ssh ${{ steps.ssh.outputs.SERVER }} \
+            "cd ${{ vars.WORDPRESS_PATH }}; \
+            env THEME_NAME=${{ vars.WORDPRESS_THEME_NAME }} \
+            NEXT_URL=${{ vars.NEXT_URL }} \
+            WORDPRESS_PATH=${{ vars.WORDPRESS_PATH }} \
+            /bin/bash -s " < ./wordpress/scripts/provision.sh
+
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          NEXT_ENV: development
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+  deploy_frontend_using_vercel:
+    name: Deploy frontend to Vercel (staging)
+    runs-on: ubuntu-latest
+    needs: deploy_backend
+    if: ${{ vars.VERCEL_PROJECT_ID != '' }}
+    strategy:
+      matrix:
+        environment:
+          - staging
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy NextJS
+        uses: ./.github/actions/deploy-vercel
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          GITHUB_DEPLOYMENT_ENV: Production
+          PRODUCTION: true
+
+  deploy_frontend_using_ssh:
+    name: Deploy frontend using SSH (staging)
+    runs-on: ubuntu-latest
+    needs: deploy_backend
+    if: ${{ vars.VERCEL_PROJECT_ID == '' }}
+    strategy:
+      matrix:
+        environment:
+          - staging
+
+    steps:
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          NEXT_ENV: development
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}

@@ -1,0 +1,32 @@
+name: 'Build Frontend'
+inputs:
+  legacy-peer-deps:
+    description: 'Install node dependencies with legacy peer dependencies'
+    required: true
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Install node dependencies (legacy)
+      if: inputs.legacy-peer-deps == 'true'
+      shell: bash
+      run: npm install --frozen-lockfile --legacy-peer-deps
+
+    - name: Install node dependencies
+      if: inputs.legacy-peer-deps != 'true'
+      shell: bash
+      run: npm install --frozen-lockfile
+
+    - name: Frontend ESLint
+      shell: bash
+      run: npm run lint --verbose
+
+    - name: Frontend Typescript Build
+      shell: bash
+      run: npm run build:typescript -- --verbose
