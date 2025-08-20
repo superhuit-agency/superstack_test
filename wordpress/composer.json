@@ -30,14 +30,14 @@
 		"valu/wp-graphql-offset-pagination": "dev-master",
 		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.0",
 		"wpackagist-plugin/advanced-custom-fields": "^6.3",
-		"wpackagist-plugin/disable-comments": "^2.4",
+		"wpackagist-plugin/disable-comments": "^2.5",
 		"wpackagist-plugin/disable-emojis": "^1.7",
 		"wpackagist-plugin/duplicate-post": "^4.5",
 		"wpackagist-plugin/redirection": "^5.3",
 		"wpackagist-plugin/simple-custom-post-order": "^2.5",
 		"wpackagist-plugin/svg-support": "^2.5",
-		"wpackagist-plugin/wordpress-seo": "^22.3",
-		"wpackagist-plugin/wp-graphql": "^1.23"
+		"wpackagist-plugin/wordpress-seo": "^25.6",
+		"wpackagist-plugin/wp-graphql": "^2.3"
 	},
 	"repositories": [
 		{
@@ -77,16 +77,8 @@
 			}
 		},
 		{
-			"type": "package",
-			"package": {
-				"name": "superhuit-agency/wp-graphql-gutenberg",
-				"version": "0.4.1",
-				"type": "wordpress-plugin",
-				"dist": {
-					"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg/archive/refs/tags/v0.4.1.supt-fix.zip",
-					"type": "zip"
-				}
-			}
+			"type": "vcs",
+			"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg"
 		},
 		{
 			"type": "package",

@@ -58,6 +58,11 @@ jobs:
 
       - name: Build WP Theme
         uses: ./.github/actions/build-theme
+        with:
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          # TODO: Remove this once the @wordpress packages are updated to support React 19
+          legacy-peer-deps: true
 
       - name: Start WP
         shell: bash
@@ -91,6 +96,9 @@ jobs:
 
       - name: Build Next Frontend
         uses: ./.github/actions/build-frontend
+        with:
+          # TODO: Remove this once the @wordpress packages are updated to support React 19
+          legacy-peer-deps: true
 
       - name: Start Next as a thread
         shell: bash

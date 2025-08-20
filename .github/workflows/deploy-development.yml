@@ -76,6 +76,11 @@ jobs:
 
       - name: Build Theme
         uses: ./.github/actions/build-theme
+        with:
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          # TODO: Remove this once the @wordpress packages are updated to support React 19
+          legacy-peer-deps: true
 
       - name: Deploy Theme
         uses: ./.github/actions/deploy-theme
@@ -119,6 +124,9 @@ jobs:
           NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
           NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          # TODO: Remove this once the @wordpress packages are updated to support React 19
+          legacy-peer-deps: true
 
   # RUN THE run-tests-development.yml workflow
   test_development:

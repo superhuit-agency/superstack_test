@@ -93,7 +93,7 @@ export default function Post({ node }: any) {
 						uptitle={dictionary.post?.relatedNews}
 						seeAllLink={{
 							title: dictionary.post?.seeAll,
-							href: node?.postsPage.uri,
+							href: node?.postsPage?.uri,
 						}}
 						posts={node.relatedPosts}
 					/>

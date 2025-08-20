@@ -16,17 +16,7 @@ const withCustomClassName = createHigherOrderComponent(
 			if ((props as any).name !== block.slug)
 				return <BlockListBlock {...props} />;
 
-			return (
-				<BlockListBlock
-					{...props}
-					className="supt-list"
-					style={{
-						counterSet: props.attributes.start
-							? `li ${props.attributes.start + 1}`
-							: null,
-					}}
-				/>
-			);
+			return <BlockListBlock {...props} className="supt-list" />;
 		};
 
 		return EnhancedComponent;
@@ -34,8 +24,14 @@ const withCustomClassName = createHigherOrderComponent(
 	'withCustomClassName'
 );
 
+export const ListEditBlockClassName: WpFilterType = {
+	hook: 'editor.BlockListBlock',
+	namespace: 'supt/list-edit-classname',
+	callback: withCustomClassName,
+};
+
 /**
- * Add custom `postTypes` to core/paragraph block
+ * Add custom `postTypes` to core/list block
  */
 const withCustomPostTypesSetting = (
 	settings: WpBlockType<any>['settings'],
@@ -45,20 +41,13 @@ const withCustomPostTypesSetting = (
 		return settings;
 	}
 
-	settings['postTypes'] = ['post', 'page'];
+	settings['postTypes'] = ['post'];
 
 	return settings;
 };
-
-export const ListEditBlockClassName: WpFilterType = {
-	hook: 'editor.BlockListBlock',
-	namespace: 'supt/list',
-	callback: withCustomClassName,
-};
-
 export const ListEditBlockSettings: WpFilterType = {
-	hook: 'editor.BlockListBlock',
-	namespace: 'supt/list',
+	hook: 'blocks.registerBlockType',
+	namespace: 'supt/list-edit-setting',
 	callback: withCustomPostTypesSetting,
 };
 

@@ -171,7 +171,10 @@ export default class videoStreamReader extends EventEmitter {
 				await currentSession.detach();
 			}
 		} catch (e) {
-			console.warn('Error detaching session', (e as Error).message);
+			console.log(
+				'Error detaching session in video streaming',
+				(e as Error).message
+			);
 		}
 
 		return true;
