@@ -227,7 +227,7 @@ describe('Admin: Create a new post to test all the blocks', () => {
 
 	it('should visit the post and be a HTTP 200', async () => {
 		// Go to the post
-		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
+		const response = await page.goto(`${NEXT_URL}/blog/${test_id}/`);
 		// Wait for the page to load
 		await page.waitForNavigation({ timeout: 10000 });
 		// Check the response status
