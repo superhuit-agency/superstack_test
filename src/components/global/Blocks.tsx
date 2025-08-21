@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import {
 	Button,
+	Buttons,
 	Checkbox,
 	Form,
 	FormSectionBreaker,
@@ -30,7 +31,8 @@ const blocksList: BlocksType = {
 	'core/list-item': ListItem,
 	'core/paragraph': Paragraph,
 
-	'supt/button': Button,
+	'core/button': Button,
+	'core/buttons': Buttons,
 
 	'supt/checkbox': Checkbox,
 	'supt/form': Form,

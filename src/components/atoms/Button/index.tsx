@@ -9,18 +9,26 @@ import block from './block.json';
 import './styles.css';
 
 export const Button: FC<ButtonProps> & BlockConfigs = ({
-	title = '',
+	text = '',
+	url,
 	className,
 	variant = 'primary',
-	...props
+	linkTarget,
+	rel,
+	width,
 }) => {
-	return title ? (
+	return text && url ? (
 		<Link
 			className={cx('supt-button', `-${variant}`, className)}
-			{...props}
+			href={url}
+			target={linkTarget || undefined}
+			rel={rel || undefined}
+			style={{
+				width: width ? `${width}%` : undefined,
+			}}
 		>
 			<span className="supt-button__inner">
-				<span>{title}</span>
+				<span dangerouslySetInnerHTML={{ __html: text }} />
 			</span>
 		</Link>
 	) : null;

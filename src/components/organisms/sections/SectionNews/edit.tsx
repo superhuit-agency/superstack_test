@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, Spinner, TextControl } from '@wordpress/components';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { _x } from '@wordpress/i18n';
 
-import { PreviewBlockImage, SectionEdit, ButtonEdit } from '#/components';
+import { PreviewBlockImage, SectionEdit } from '#/components';
 import { useGraphQlApi } from '#/hooks';
 
 import { CardNews } from '@/components/molecules/cards/CardNews';
@@ -27,7 +28,6 @@ const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
 		introduction,
 		postLinkLabel,
 		queryVars = {},
-		seeAllLink,
 		title,
 		uptitle,
 	} = props.attributes;
@@ -119,24 +119,21 @@ const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
 						)}
 
 						<div className="supt-section__link-wrapper">
-							<ButtonEdit
-								attrs={seeAllLink as ButtonAttributes}
-								onChange={(attrs: object) =>
-									props.setAttributes({
-										seeAllLink: attrs,
-									})
-								}
-								placeholder={_x(
-									'See all news',
-									'Button Placeholder',
-									'supt'
-								)}
-								isSelected={props.isSelected}
-								toolbarPosition="left"
-								wrapperClass="supt-section__link-inner"
-								rootClass="supt-section__link"
-								linkSettings={{ settings: [] }}
-								inBlockControls={false}
+							<InnerBlocks
+								allowedBlocks={['core/button']}
+								template={[
+									[
+										'core/button',
+										{
+											text: _x(
+												'See all news',
+												'Button Placeholder',
+												'supt'
+											),
+										},
+									],
+								]}
+								templateLock="all"
 							/>
 						</div>
 					</div>
@@ -186,13 +183,6 @@ export const SectionNewsBlock: WpBlockType<SectionNewsAttributes> = {
 				type: 'object',
 				default: {},
 			},
-			seeAllLink: {
-				type: 'object',
-				default: {
-					title: 'See all news',
-					href: '',
-				},
-			},
 			title: { type: 'string' },
 			uptitle: { type: 'string' },
 		},
@@ -203,6 +193,6 @@ export const SectionNewsBlock: WpBlockType<SectionNewsAttributes> = {
 			},
 		} as any,
 		edit: Edit,
-		save: () => null,
+		save: () => <InnerBlocks.Content />,
 	},
 };
