@@ -93,12 +93,12 @@ You can convert any frontend static block into an editable block within WP Edito
     />
     ```
 
--   `CharacterLimit` → to add a limit of characters on any text. (📚 [more infos here](../../wordpress/theme/lib/editor/components/CharacterLimit/README.md))
+-   `RichTextWithLimit` → to add a limit of characters on a RichText. (📚 [more infos here](../../wordpress/theme/lib/editor/components/RichTextWithLimit/README.md))
 
     ```tsx
-    <CharacterLimit
-    	value={title}
+    <RichTextWithLimit
     	limit={140}
+    	value={title}
     	onChange={(title) =>
     		props.setAttributes({
     			title,
