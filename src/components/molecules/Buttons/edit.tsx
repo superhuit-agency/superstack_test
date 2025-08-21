@@ -6,7 +6,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import block from './block.json';
 
 // styles
-import './styles.edit.css';
 import './styles.css';
 
 /**
@@ -18,39 +17,17 @@ const withCustomClassName = createHigherOrderComponent(
 			if ((props as any).name !== block.slug)
 				return <BlockListBlock {...props} />;
 
-			return <BlockListBlock {...props} className="supt-button" />;
+			return <BlockListBlock {...props} className="supt-buttons" />;
 		};
 
 		return EnhancedComponent;
 	},
 	'withCustomClassName'
 );
-export const ButtonEditBlockClassName: WpFilterType = {
+export const ButtonsEditBlockClassName: WpFilterType = {
 	hook: 'editor.BlockListBlock',
-	namespace: 'supt/button-edit-classname',
+	namespace: 'supt/buttons-edit-classname',
 	callback: withCustomClassName,
-};
-
-/**
- * Add custom className to core/button inner block (which is the button itself)
- */
-const withCustomInnerClassName = createHigherOrderComponent(
-	(BlockEdit: ComponentType<any>) => {
-		const EnhancedComponent = (props: BlockEditProps<any>) => {
-			if ((props as any).name !== block.slug)
-				return <BlockEdit {...props} />;
-
-			return <BlockEdit {...props} className="supt-button__inner" />;
-		};
-
-		return EnhancedComponent;
-	},
-	'withCustomInnerClassName'
-);
-export const ButtonEditBlockInnerClassName: WpFilterType = {
-	hook: 'editor.BlockEdit',
-	namespace: 'supt/button-edit-inner-classname',
-	callback: withCustomInnerClassName,
 };
 
 /**
@@ -68,12 +45,12 @@ const withCustomPostTypesSetting = (
 
 	return settings;
 };
-export const ButtonEditBlockSettings: WpFilterType = {
+export const ButtonsEditBlockSettings: WpFilterType = {
 	hook: 'blocks.registerBlockType',
-	namespace: 'supt/button-edit-setting',
+	namespace: 'supt/buttons-edit-setting',
 	callback: withCustomPostTypesSetting,
 };
 
-export const ButtonBlock = {
+export const ButtonsBlock = {
 	slug: block.slug,
 };

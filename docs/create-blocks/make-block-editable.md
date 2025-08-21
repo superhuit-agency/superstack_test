@@ -52,18 +52,6 @@ You can convert any frontend static block into an editable block within WP Edito
 
 ### Custom components
 
--   `ButtonEdit` → to add a button or a link
-
-    ```tsx
-    <ButtonEdit
-    	attrs={link}
-    	onChange={(link) => props.setAttributes({ link })}
-    	placeholder={_x('My placeholder text', 'Link Placeholder', 'supt')}
-    	toolbarPosition="right"
-    	rootClass="supt-myBlock__link supt-link"
-    />
-    ```
-
 -   `ImageEdit` → to add an image
 
     ```tsx

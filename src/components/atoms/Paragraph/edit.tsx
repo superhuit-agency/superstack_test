@@ -1,7 +1,5 @@
 import { ComponentType } from 'react';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import domReady from '@wordpress/dom-ready';
-import { unregisterFormatType } from '@wordpress/rich-text';
 import { BlockEditProps } from '@wordpress/blocks';
 
 // internal imports

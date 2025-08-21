@@ -17,15 +17,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
 	args: {
-		title: 'Button Primary',
-		href: '#',
+		text: 'Button Primary',
+		url: '#',
 	},
 };
 
 export const Secondary: Story = {
 	args: {
-		title: 'Button Secondary',
-		href: '#',
+		text: 'Button Secondary',
+		url: '#',
 		variant: 'secondary',
 	},
 };
