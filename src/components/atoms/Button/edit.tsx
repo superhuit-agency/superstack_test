@@ -1,6 +1,11 @@
 import { ComponentType } from 'react';
+import domReady from '@wordpress/dom-ready';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { BlockEditProps } from '@wordpress/blocks';
+import {
+	BlockEditProps,
+	registerBlockStyle,
+	unregisterBlockStyle,
+} from '@wordpress/blocks';
 
 // internal imports
 import block from './block.json';
@@ -73,6 +78,21 @@ export const ButtonEditBlockSettings: WpFilterType = {
 	namespace: 'supt/button-edit-setting',
 	callback: withCustomPostTypesSetting,
 };
+
+// Unregister default button styles to register custom styles (primary + secondary variants)
+domReady(() => {
+	unregisterBlockStyle('core/button', 'fill');
+	unregisterBlockStyle('core/button', 'outline');
+	registerBlockStyle('core/button', {
+		name: 'primary',
+		label: 'Primary',
+		isDefault: true,
+	});
+	registerBlockStyle('core/button', {
+		name: 'secondary',
+		label: 'Secondary',
+	});
+});
 
 export const ButtonBlock = {
 	slug: block.slug,

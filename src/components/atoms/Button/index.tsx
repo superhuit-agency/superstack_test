@@ -15,7 +15,7 @@ export const Button: FC<ButtonProps> & BlockConfigs = ({
 	variant = 'primary',
 	linkTarget,
 	rel,
-	width,
+	// width,
 }) => {
 	return text && url ? (
 		<Link
@@ -23,9 +23,9 @@ export const Button: FC<ButtonProps> & BlockConfigs = ({
 			href={url}
 			target={linkTarget || undefined}
 			rel={rel || undefined}
-			style={{
-				width: width ? `${width}%` : undefined,
-			}}
+			// style={{
+			// 	width: width ? `${width}%` : undefined,
+			// }}
 		>
 			<span className="supt-button__inner">
 				<span dangerouslySetInnerHTML={{ __html: text }} />
