@@ -43,6 +43,13 @@ const withCustomPostTypesSetting = (
 
 	settings['postTypes'] = ['post', 'page'];
 
+	// Remove layout controls in sidebar
+	settings.supports = {
+		...settings.supports,
+		align: false,
+		layout: false,
+	};
+
 	return settings;
 };
 export const ButtonsEditBlockSettings: WpFilterType = {
