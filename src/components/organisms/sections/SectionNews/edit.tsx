@@ -4,7 +4,7 @@ import { PanelBody, Spinner, TextControl } from '@wordpress/components';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { _x } from '@wordpress/i18n';
 
-import { PreviewBlockImage, SectionEdit } from '#/components';
+import { EditWithPreview, SectionEdit } from '#/components';
 import { useGraphQlApi } from '#/hooks';
 
 import { CardNews } from '@/components/molecules/cards/CardNews';
@@ -22,8 +22,6 @@ import './styles.edit.css';
  * COMPONENT EDIT
  */
 const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
-	const slug = props.name;
-
 	const {
 		introduction,
 		postLinkLabel,
@@ -38,10 +36,6 @@ const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
 		isLoading,
 		data: { posts },
 	} = useGraphQlApi(getData, variables);
-
-	// For block preview
-	if (slug && props.attributes.isPreview)
-		return <PreviewBlockImage slug={slug} />;
 
 	return (
 		<>
@@ -192,7 +186,8 @@ export const SectionNewsBlock: WpBlockType<SectionNewsAttributes> = {
 				isPreview: true,
 			},
 		} as any,
-		edit: Edit,
+		edit: (props: WpBlockEditProps<SectionNewsAttributes>) =>
+			EditWithPreview({ Edit, ...props }),
 		save: () => <InnerBlocks.Content />,
 	},
 };
