@@ -7,7 +7,7 @@ interface WpBlockType<T> {
 		};
 }
 
-type PostType = 'page' | 'post' | 'form' | 'wp_block';
+type PostType = (typeof POST_TYPES_SINGLE_SLUGS)[number] | 'form' | 'wp_block';
 
 interface WpBlockEditProps<T> extends Omit<BlockEditProps<T>, 'attributes'> {
 	name?: string;
