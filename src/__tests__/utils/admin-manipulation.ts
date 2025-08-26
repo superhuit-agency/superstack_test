@@ -165,6 +165,21 @@ async function loginPageRequiresStep(page: Page) {
 	);
 }
 
+export async function discardTutorialIfNeeded(page: Page) {
+	await page
+		.waitForSelector('.components-modal__frame.components-guide', {
+			timeout: 500,
+		})
+		.then(async (el) => {
+			if (el) {
+				await el.click();
+			}
+		})
+		.catch(() => {
+			// No tutorial found, so we're good
+		});
+}
+
 /**
  * Builds the HTML <--wp:--> of a Worpress block from its arguments
  * TODO: Handle children and content

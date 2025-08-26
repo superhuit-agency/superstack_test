@@ -8,6 +8,7 @@ import { Page } from 'puppeteer';
 import * as AllComponentsTests from '@/components/test';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
+	discardTutorialIfNeeded,
 	doLoginIfNeeded,
 	setCodeEditor,
 	setRightPanel,
@@ -90,6 +91,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.goto(
 			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
 		);
+		await discardTutorialIfNeeded(page);
 	});
 
 	it('should deactivate the Code Editor', async () => {
