@@ -96,7 +96,7 @@ export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 
 ### Unit tests
 
-Follow [this documentation](../tests/readme.md) to implement some unit tests to your components and ensure a good code coverage.
+Follow [this documentation](../automation/tests.md) to implement some unit tests to your components and ensure a good code coverage.
 
 ## 🏷️ Typing `typings.d.ts`
 

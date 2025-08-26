@@ -99,7 +99,8 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 -   [Blocks Whitelisting](./docs/features/blocks-whitelisting.md)
 -   [Forms](./docs/features/forms.md)
 -   [Multilang](./docs/features/multilang.md)
--   [Testing](./docs/tests/readme.md)
+-   [Testing](./docs/automation/tests.md)
+-   [Github Workflows](./docs/automation/github-workflows.md)
 
 ## 📚 Resources
 
