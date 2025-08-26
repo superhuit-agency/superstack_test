@@ -125,7 +125,7 @@ const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
 									[
 										'core/button',
 										{
-											text: _x(
+											placeholder: _x(
 												'See all news',
 												'Button Placeholder',
 												'supt'

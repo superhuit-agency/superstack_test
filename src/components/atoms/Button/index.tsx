@@ -15,14 +15,16 @@ export const Button: FC<ButtonProps> & BlockConfigs = ({
 	variant = 'primary',
 	linkTarget,
 	rel,
+	onClick,
 	// width,
 }) => {
-	return text && url ? (
+	return text ? (
 		<Link
 			className={cx('supt-button', `-${variant}`, className)}
 			href={url}
 			target={linkTarget || undefined}
 			rel={rel || undefined}
+			onClick={onClick}
 			// style={{
 			// 	width: width ? `${width}%` : undefined,
 			// }}
