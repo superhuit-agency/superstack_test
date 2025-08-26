@@ -77,7 +77,7 @@ describe('Admin: Create a new post to test all the blocks', () => {
 
 	it('should open the admin and login', async () => {
 		// Go to the admin page
-		await page.goto(`${WORDPRESS_URL}/wp-admin/`);
+		await page.goto(`${WORDPRESS_URL}/wp-admin/`, { waitUntil: 'load' });
 		await doLoginIfNeeded(
 			page,
 			WORDPRESS_ADMIN_USER,
