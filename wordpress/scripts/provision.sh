@@ -35,7 +35,7 @@ WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
 WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
 WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
 WORDPRESS_THEME_NAME=${WORDPRESS_THEME_NAME:="superstack"}
-
+WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
@@ -79,7 +79,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		echo $en "- Installing WordPress as localhost $ec"
-		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt --locale="$WORDPRESS_LOCALE" --quiet &> /dev/null
+		$WPCLI config create --dbhost="db" --dbname="wordpress" --dbuser="wordpress" --dbpass="wordpress" --locale="$WORDPRESS_LOCALE" --quiet &> /dev/null
 		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" --quiet &> /dev/null
 		echo "✔"
 		FIRSTTIME_INSTALL=true
