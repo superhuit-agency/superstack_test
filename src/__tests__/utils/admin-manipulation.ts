@@ -167,7 +167,7 @@ async function loginPageRequiresStep(page: Page) {
 
 export async function discardTutorialIfNeeded(page: Page) {
 	await page
-		.waitForSelector('.components-modal__frame.components-guide', {
+		.waitForSelector('.components-guide .components-modal__header button', {
 			timeout: 500,
 		})
 		.then(async (el) => {

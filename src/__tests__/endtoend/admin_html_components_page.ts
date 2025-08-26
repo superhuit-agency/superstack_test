@@ -88,7 +88,8 @@ describe('Admin: Create a new post to test all the blocks', () => {
 	it('should open the admin to create a new page', async () => {
 		// Go to the admin page to create a new page
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`,
+			{ waitUntil: 'load' }
 		);
 		await discardTutorialIfNeeded(page);
 	});
