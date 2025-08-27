@@ -74,9 +74,32 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 	if ((await isRightPanelOpen(page)) === activate) {
 		return;
 	}
-	await page.click(
-		'button[aria-label="Settings"][aria-controls="edit-post:document"]'
-	);
+	await page
+		.waitForSelector(
+			`button.is-compact[aria-controls="edit-post:document"]`,
+			{
+				timeout: 500,
+			}
+		)
+		.then(async (el) => {
+			if (el) {
+				await el.click();
+			}
+		})
+		.catch(() => {
+			page.waitForSelector('.editor-header', {
+				timeout: 500,
+			}).then(async (panel) => {
+				if (panel) {
+					console.log(
+						'editor-header content:',
+						panel.evaluate((el) => el.innerHTML)
+					);
+				}
+			});
+
+			throw new Error('Right panel button not found');
+		});
 };
 
 export const doLoginIfNeeded = async (
@@ -85,7 +108,14 @@ export const doLoginIfNeeded = async (
 	password: string
 ) => {
 	// Find out if we need to login (url changed to wp-login.php)
-	const url = await page.url();
+	let url = await page.url();
+	if (url.includes('setup-config.php')) {
+		// Maybe the user needs to choose a language at first login
+		await doChooseLanguageIfNeeded(page);
+		// Maybe the user needs to run a database update
+		await doRunDatabaseUpdateIfNeeded(page);
+		url = await page.url();
+	}
 	if (url.includes('wp-login.php')) {
 		// Find the username input and type the username
 		await page.waitForSelector('#user_login', { timeout: 5000 });
@@ -118,6 +148,60 @@ export const doLoginIfNeeded = async (
 		});
 	}
 };
+
+export const doChooseLanguageIfNeeded = async (page: Page) => {
+	await page
+		.waitForSelector('#language-continue', { timeout: 500 })
+		.then(async (el) => {
+			if (el) {
+				await el.click();
+			}
+		})
+		.catch(() => {
+			// No language selector found, so we're good
+		});
+};
+export const doRunDatabaseUpdateIfNeeded = async (page: Page) => {
+	let skip = false;
+	while (!skip && (await loginPageRequiresStep(page))) {
+		await page
+			.waitForSelector('.wp-core-ui .step a', { timeout: 500 })
+			.then(async (el) => {
+				if (el) {
+					await el.click();
+					// wait for the page to load a bit after clicking
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+				}
+			})
+			.catch(() => {
+				// something happened, let's say we're done
+				skip = true;
+			});
+	}
+};
+async function loginPageRequiresStep(page: Page) {
+	return await page.evaluate(
+		() => {
+			return document.querySelector('.wp-core-ui .step') != null;
+		},
+		{ timeout: 500 }
+	);
+}
+
+export async function discardTutorialIfNeeded(page: Page) {
+	await page
+		.waitForSelector('.components-guide .components-modal__header button', {
+			timeout: 500,
+		})
+		.then(async (el) => {
+			if (el) {
+				await el.click();
+			}
+		})
+		.catch(() => {
+			// No tutorial found, so we're good
+		});
+}
 
 /**
  * Builds the HTML <--wp:--> of a Worpress block from its arguments

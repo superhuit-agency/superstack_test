@@ -73,6 +73,7 @@ jobs:
         env:
           THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
           RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
           RELEASE_BELT_PASSWORD: ${{ secrets.RELEASE_BELT_PASSWORD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 

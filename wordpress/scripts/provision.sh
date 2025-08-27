@@ -35,7 +35,7 @@ WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
 WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
 WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
 WORDPRESS_THEME_NAME=${WORDPRESS_THEME_NAME:="superstack"}
-
+WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
@@ -73,14 +73,38 @@ fi
 # install wp (if not installed)
 # /!\ dev note: don't write anything in the folder before this or it will fail, saying 'the folder is not empty'
 if ! $WPCLI core is-installed --quiet &> /dev/null; then
-	echo
-	echo "-------------------------------------------------------------------"
-	echo "                   WordPress installation                          "
-	echo "-------------------------------------------------------------------"
+	echo "------------------------------------------------------------------"
+	echo "                   WordPress installation                         "
+	echo "------------------------------------------------------------------"
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
+		# Wait for database to be ready (for dev environment)
+		echo $en "- Waiting for local database to be ready $ec"
+		if ! nc -z db 3306 2>/dev/null; then
+			echo "  [DEBUG] Network connectivity test failed - database host 'db' not reachable on port 3306"
+		fi
+		timeout=60
+		attempt=1
+		while ! mysqladmin ping -h db -u wordpress --password=wordpress --silent 2>/dev/null; do
+			if [ $timeout -le 0 ]; then
+				echo "✗"
+				echo "  [ERROR] Timeout. Final database connection attempt with verbose output:"
+				mysqladmin ping -h db -u wordpress --password=wordpress 2>&1 || true
+				docker ps --filter "name=db" || true
+				echo "  [DEBUG] Database container logs (last 20 lines):"
+				docker logs --tail 20 "${THEME_NAME:-superstack}_db" 2>&1 || true
+				exit 1
+			fi
+			sleep 3
+			timeout=$((timeout-3))
+			attempt=$((attempt+1))
+		done
+		echo "✔"
+		echo "  [DEBUG] Database connection established after $attempt attempts"
 		echo $en "- Installing WordPress as localhost $ec"
-		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" --quiet &> /dev/null
+		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" &> /dev/null
+		$WPCLI config create --dbhost="db" --dbname="wordpress" --dbuser="wordpress" --dbpass="wordpress" --force --locale="$WORDPRESS_LOCALE" &> /dev/null
+		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" &> /dev/null
 		echo "✔"
 		FIRSTTIME_INSTALL=true
 
@@ -130,10 +154,9 @@ if [ -d "$WORDPRESS_PATH/wp-content/themes/_new" ]; then
 	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
 fi
 
-echo
-echo "-------------------------------------------------------------------"
-echo "                   Theme install & configuration                   "
-echo "-------------------------------------------------------------------"
+echo "------------------------------------------------------------------"
+echo "                  Theme install & configuration                   "
+echo "------------------------------------------------------------------"
 echo
 
 if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
@@ -153,9 +176,9 @@ $WPCLI theme uninstall twentytwentyfour --quiet &> /dev/null
 echo "✔"
 
 echo
-echo "-------------------------------------------------------------------"
-echo "                   Plugins install & configuration                 "
-echo "-------------------------------------------------------------------"
+echo "------------------------------------------------------------------"
+echo "                  Plugins install & configuration                 "
+echo "------------------------------------------------------------------"
 echo
 
 echo $en "- Uninstalling default plugins $ec"
@@ -163,9 +186,19 @@ $WPCLI plugin uninstall hello --deactivate --quiet &> /dev/null
 $WPCLI plugin uninstall akismet --deactivate --quiet &> /dev/null
 echo "✔"
 
-echo $en "- Activating plugins $ec"
-$WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --skip-update-check) --quiet &> /dev/null
+echo $en "- Activating all plugins $ec"
+$WPCLI plugin activate --all --quiet
 echo "✔"
+INACTIVE_PLUGINS=$($WPCLI plugin list --status=inactive --field=name --skip-update-check)
+
+if [ ! -z "$INACTIVE_PLUGINS" ]; then
+	echo "- Activating inactive plugins (2nd attempt)"
+	# Iterate over inactive plugins and activate them
+	for plugin in $INACTIVE_PLUGINS; do
+		$WPCLI plugin activate "$plugin"
+	done
+	echo "✔"
+fi
 
 # Multilang
 __dir="$(dirname "${BASH_SOURCE[0]:-$0}")"
@@ -187,9 +220,9 @@ fi
 
 if [ "$FIRSTTIME_INSTALL" = true ]; then
 	echo
-	echo "-------------------------------------------------------------------"
-	echo "                      First time install                           "
-	echo "-------------------------------------------------------------------"
+	echo "------------------------------------------------------------------"
+	echo "                        First time install                        "
+	echo "------------------------------------------------------------------"
 	echo
 
 	# Update Sample Page to be the Home
@@ -214,9 +247,9 @@ if [ "$FIRSTTIME_INSTALL" = true ]; then
 fi
 
 echo
-echo "-------------------------------------------------------------------"
-echo "                       Other configs                               "
-echo "-------------------------------------------------------------------"
+echo "------------------------------------------------------------------"
+echo "                          Other configs                           "
+echo "------------------------------------------------------------------"
 echo
 
 # Setup redirection tables
@@ -267,8 +300,12 @@ fi
 echo $en "- Flushing rewrite rules $ec"
 $WPCLI rewrite flush --hard --quiet
 echo "✔"
-
-echo
-echo "-------------------------------------------------------------------"
-echo "                   Installation complete                           "
-echo "-------------------------------------------------------------------"
+echo ""
+echo "------------------------------------------------------------------"
+echo ""
+echo "Wordpress running on version $($WPCLI core version --quiet) !"
+echo ""
+$WPCLI plugin status
+echo ""
+echo "==================   INSTALLATION COMPLETE !   ==================="
+echo ""

@@ -26,7 +26,7 @@ export const formatter = (
 
 	if (!img || !isValidData(img)) {
 		if (process.env.NODE_ENV === 'development') {
-			console.error('Invalid image data');
+			console.warn('Invalid image data', img);
 		}
 		return undefined;
 	}
