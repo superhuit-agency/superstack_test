@@ -76,8 +76,10 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 	}
 	await page
 		.waitForSelector(
-			'button[aria-label="Settings"][aria-controls="edit-post:document"]',
-			{ timeout: 500 }
+			`button.is-compact[aria-controls="edit-post:document"]`,
+			{
+				timeout: 500,
+			}
 		)
 		.then(async (el) => {
 			if (el) {
@@ -85,6 +87,14 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 			}
 		})
 		.catch(() => {
+			console.log(
+				'edit-post-header__settings content:',
+				page.evaluate(
+					() =>
+						document.querySelector('.edit-post-header__settings')
+							?.innerHTML
+				)
+			);
 			throw new Error('Right panel button not found');
 		});
 };
