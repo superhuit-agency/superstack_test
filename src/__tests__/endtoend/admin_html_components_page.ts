@@ -222,6 +222,8 @@ describe('Admin: Create a new post to test all the blocks', () => {
 		await page.click(
 			'.components-button.editor-post-publish-button.editor-post-publish-button__button'
 		);
+		// wait a bit (or implement await)
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 	});
 
 	it('should see the success message in the snackbar', async () => {
