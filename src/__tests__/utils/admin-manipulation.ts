@@ -74,9 +74,19 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 	if ((await isRightPanelOpen(page)) === activate) {
 		return;
 	}
-	await page.click(
-		'button[aria-label="Settings"][aria-controls="edit-post:document"]'
-	);
+	await page
+		.waitForSelector(
+			'button[aria-label="Settings"][aria-controls="edit-post:document"]',
+			{ timeout: 500 }
+		)
+		.then(async (el) => {
+			if (el) {
+				await el.click();
+			}
+		})
+		.catch(() => {
+			throw new Error('Right panel button not found');
+		});
 };
 
 export const doLoginIfNeeded = async (
