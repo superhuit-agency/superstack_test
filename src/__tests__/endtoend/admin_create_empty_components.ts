@@ -8,6 +8,7 @@ import { Page } from 'puppeteer';
 import * as AllComponentsTests from '@/components/test';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
+	discardTutorialIfNeeded,
 	doLoginIfNeeded,
 	setCodeEditor,
 	setRightPanel,
@@ -77,7 +78,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should open the admin and login', async () => {
 		// Go to the admin page
-		await page.goto(`${WORDPRESS_URL}/wp-admin/`);
+		await page.goto(`${WORDPRESS_URL}/wp-admin/`, { waitUntil: 'load' });
 		await doLoginIfNeeded(
 			page,
 			WORDPRESS_ADMIN_USER,
@@ -88,8 +89,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should open the admin to create a new post', async () => {
 		// Go to the admin page to create a new post
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`,
+			{ waitUntil: 'load' }
 		);
+		await discardTutorialIfNeeded(page);
 	});
 
 	it('should deactivate the Code Editor', async () => {
@@ -164,16 +167,15 @@ describe('Admin: Create a page to test all the blocks', () => {
 		// Wait for any notification to disappear
 		await page.waitForSelector(
 			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
-			{ timeout: 5000, hidden: true }
+			{ timeout: 10000, hidden: true }
 		);
-		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(
-			'.components-button.editor-post-save-draft',
-			{ timeout: 5000 }
+			'button.components-button.editor-post-save-draft',
+			{ timeout: 500 }
 		);
 		// Click on it
-		await page.click('.components-button.editor-post-save-draft');
+		await page.click('button.components-button.editor-post-save-draft');
 	});
 
 	it('should display a success message in the snackbar', async () => {

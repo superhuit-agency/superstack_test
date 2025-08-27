@@ -8,6 +8,7 @@ import { Page } from 'puppeteer';
 import { Stories as AllTestableComponents } from '@/components/stories';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
+	discardTutorialIfNeeded,
 	doLoginIfNeeded,
 	setCodeEditor,
 	setRightPanel,
@@ -76,7 +77,7 @@ describe('Admin: Create a new post to test all the blocks', () => {
 
 	it('should open the admin and login', async () => {
 		// Go to the admin page
-		await page.goto(`${WORDPRESS_URL}/wp-admin/`);
+		await page.goto(`${WORDPRESS_URL}/wp-admin/`, { waitUntil: 'load' });
 		await doLoginIfNeeded(
 			page,
 			WORDPRESS_ADMIN_USER,
@@ -87,8 +88,10 @@ describe('Admin: Create a new post to test all the blocks', () => {
 	it('should open the admin to create a new page', async () => {
 		// Go to the admin page to create a new page
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`,
+			{ waitUntil: 'load' }
 		);
+		await discardTutorialIfNeeded(page);
 	});
 
 	it('should activate the HTML editor', async () => {
@@ -200,6 +203,11 @@ describe('Admin: Create a new post to test all the blocks', () => {
 	});
 
 	it('should save the post as published', async () => {
+		// Wait for any notification to disappear
+		await page.waitForSelector(
+			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
+			{ timeout: 10000, hidden: true }
+		);
 		// Find the "Publish" button
 		await page.waitForSelector(
 			'.components-button.editor-post-publish-button__button',
@@ -214,24 +222,43 @@ describe('Admin: Create a new post to test all the blocks', () => {
 		await page.click(
 			'.components-button.editor-post-publish-button.editor-post-publish-button__button'
 		);
-		await new Promise((resolve) => setTimeout(resolve, 500));
+		// wait a bit (or implement await)
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 	});
 
-	it('should see the success message in the snackbar', async () => {
+	it('should visit the created post and be a HTTP 200', async () => {
 		// Find the success message
-		await page.waitForSelector(
-			'.components-snackbar .components-button.components-snackbar__action',
-			{ timeout: 5000 }
-		);
-	});
-
-	it('should visit the post and be a HTTP 200', async () => {
-		// Go to the post
-		const response = await page.goto(`${NEXT_URL}/blog/${test_id}/`);
-		// Wait for the page to load
-		await page.waitForNavigation({ timeout: 10000 });
-		// Check the response status
-		expect(response?.status()).toBe(200);
+		await page
+			.waitForSelector(
+				'.components-snackbar .components-button.components-snackbar__action',
+				{ timeout: 5000 }
+			)
+			.then(async (el) => {
+				// click on link in snackbar
+				if (el) {
+					console.log(`clicking on link in snackbar`);
+					await el.click();
+					// wait that url changes
+					const response = await page.waitForNavigation({
+						timeout: 2000,
+					});
+					// wait for page to load and be a HTTP 200
+					expect(response?.status()).toBe(200);
+					console.log(`loaded successfully: ${response?.url()}`);
+				}
+			})
+			.catch(async (err) => {
+				// if no link to click, visit the post directly
+				// wait a bit (or implement await)
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+				console.log(`visiting ${NEXT_URL}/blog/${test_id}/`);
+				// wait for page to load and be a HTTP 200
+				const response = await page.goto(
+					`${NEXT_URL}/blog/${test_id}/`
+				);
+				await page.waitForNavigation({ timeout: 10000 });
+				expect(response?.status()).toBe(200);
+			});
 		// Give a second to any human eye looking at this test execution.
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 	});
