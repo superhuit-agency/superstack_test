@@ -33,12 +33,12 @@ runs:
 
     - name: Install dependencies for jest + puppeteer
       shell: bash
-      run: npm ci --legacy-peer-deps
+      run: npm install --legacy-peer-deps
 
     - name: Install Puppeteer dependencies
       shell: bash
       run: |
-        sudo apt-get install -y \
+        sudo apt-get install -y --qq \
           libnss3-dev \
           libatk-bridge2.0-dev \
           libdrm-dev \
@@ -52,7 +52,7 @@ runs:
       run: |
         wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
         sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-        sudo apt-get install -y google-chrome-stable
+        sudo apt-get install google-chrome-stable -y -qq
 
     - name: Check Chrome installation
       shell: bash
