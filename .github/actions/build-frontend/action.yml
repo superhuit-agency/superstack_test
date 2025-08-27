@@ -30,3 +30,7 @@ runs:
     - name: Frontend Typescript Build
       shell: bash
       run: npm run build:typescript -- --verbose
+
+    - name: Frontend Build
+      shell: bash
+      run: npm run build
