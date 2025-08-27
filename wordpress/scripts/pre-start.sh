@@ -2,8 +2,8 @@
 ###
 # This script is used to download WordPress and extract it to `.data/wp`
 # It is called by the prestart script in `package.json`
-# The goal is to have a copy of WordPress locally in order
-# to enable to debug WordPress file with xdebug.
+# The goal is to have a copy of WordPress locally
+# to enable to debug WordPress file with xdebug, see commented lines in Dockerfile.
 # See `pathMappings` property in `.vscode/launch.json` pathMappings
 ###
 
