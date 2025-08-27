@@ -44,6 +44,12 @@ services:
       - '3306:3306'
     container_name: "${THEME_NAME:-'superstack'}_db"
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
     environment:
       MYSQL_ROOT_PASSWORD: wordpress
       MYSQL_DATABASE: wordpress
