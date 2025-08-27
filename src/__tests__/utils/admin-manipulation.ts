@@ -87,12 +87,12 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 			}
 		})
 		.catch(() => {
-			page.waitForSelector('.edit-post-header__settings', {
+			page.waitForSelector('.editor-header', {
 				timeout: 500,
 			}).then(async (panel) => {
 				if (panel) {
 					console.log(
-						'edit-post-header__settings content:',
+						'editor-header content:',
 						panel.evaluate((el) => el.innerHTML)
 					);
 				}

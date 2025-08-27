@@ -169,14 +169,13 @@ describe('Admin: Create a page to test all the blocks', () => {
 			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
 			{ timeout: 5000, hidden: true }
 		);
-		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(
-			'.components-button.editor-post-save-draft',
-			{ timeout: 5000 }
+			'button.components-button.editor-post-save-draft',
+			{ timeout: 500 }
 		);
 		// Click on it
-		await page.click('.components-button.editor-post-save-draft');
+		await page.click('button.components-button.editor-post-save-draft');
 	});
 
 	it('should display a success message in the snackbar', async () => {
