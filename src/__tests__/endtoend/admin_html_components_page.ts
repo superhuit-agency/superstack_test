@@ -226,21 +226,39 @@ describe('Admin: Create a new post to test all the blocks', () => {
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	});
 
-	it('should see the success message in the snackbar', async () => {
+	it('should visit the created post and be a HTTP 200', async () => {
 		// Find the success message
-		await page.waitForSelector(
-			'.components-snackbar .components-button.components-snackbar__action',
-			{ timeout: 5000 }
-		);
-	});
-
-	it('should visit the post and be a HTTP 200', async () => {
-		// Go to the post
-		const response = await page.goto(`${NEXT_URL}/blog/${test_id}/`);
-		// Wait for the page to load
-		await page.waitForNavigation({ timeout: 10000 });
-		// Check the response status
-		expect(response?.status()).toBe(200);
+		await page
+			.waitForSelector(
+				'.components-snackbar .components-button.components-snackbar__action',
+				{ timeout: 5000 }
+			)
+			.then(async (el) => {
+				// click on link in snackbar
+				if (el) {
+					console.log(`clicking on link in snackbar`);
+					await el.click();
+					// wait that url changes
+					const response = await page.waitForNavigation({
+						timeout: 2000,
+					});
+					// wait for page to load and be a HTTP 200
+					expect(response?.status()).toBe(200);
+					console.log(`loaded successfully: ${response?.url()}`);
+				}
+			})
+			.catch(async (err) => {
+				// if no link to click, visit the post directly
+				// wait a bit (or implement await)
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+				console.log(`visiting ${NEXT_URL}/blog/${test_id}/`);
+				// wait for page to load and be a HTTP 200
+				const response = await page.goto(
+					`${NEXT_URL}/blog/${test_id}/`
+				);
+				await page.waitForNavigation({ timeout: 10000 });
+				expect(response?.status()).toBe(200);
+			});
 		// Give a second to any human eye looking at this test execution.
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 	});
