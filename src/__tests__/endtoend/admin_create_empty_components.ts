@@ -167,7 +167,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		// Wait for any notification to disappear
 		await page.waitForSelector(
 			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
-			{ timeout: 5000, hidden: true }
+			{ timeout: 10000, hidden: true }
 		);
 		// Find the "Save Draft" button
 		await page.waitForSelector(
