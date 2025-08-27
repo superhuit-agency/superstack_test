@@ -80,41 +80,21 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		# Wait for database to be ready (for dev environment)
 		echo $en "- Waiting for local database to be ready $ec"
-		echo "  [DEBUG] Database connection details:"
-		echo "  [DEBUG]   Host: db"
-		echo "  [DEBUG]   Database: wordpress"
-		echo "  [DEBUG]   User: wordpress"
-		echo "  [DEBUG]   Password: wordpress"
-
-		# Test basic network connectivity first
-		echo "  [DEBUG] Testing network connectivity to database host..."
 		if ! nc -z db 3306 2>/dev/null; then
 			echo "  [DEBUG] Network connectivity test failed - database host 'db' not reachable on port 3306"
-		else
-			echo "  [DEBUG] Network connectivity test passed - database host is reachable"
 		fi
-
-		timeout=90
+		timeout=60
 		attempt=1
 		while ! mysqladmin ping -h db -u wordpress --password=wordpress --silent 2>/dev/null; do
 			if [ $timeout -le 0 ]; then
 				echo "✗"
-				echo "ERROR: Timeout waiting for database to be ready after $attempt attempts" 1>&2
-				echo "  [DEBUG] Final connection attempt with verbose output:"
+				echo "  [ERROR] Timeout. Final database connection attempt with verbose output:"
 				mysqladmin ping -h db -u wordpress --password=wordpress 2>&1 || true
-				echo "  [DEBUG] Checking if database container is running:"
 				docker ps --filter "name=db" || true
 				echo "  [DEBUG] Database container logs (last 20 lines):"
 				docker logs --tail 20 "${THEME_NAME:-superstack}_db" 2>&1 || true
 				exit 1
 			fi
-
-			if [ $((attempt % 10)) -eq 1 ]; then
-				echo "  [DEBUG] Connection attempt $attempt (${timeout}s remaining)..."
-				# Show more detailed error every 10th attempt
-				mysqladmin ping -h db -u wordpress --password=wordpress 2>&1 | head -3 || true
-			fi
-
 			sleep 3
 			timeout=$((timeout-3))
 			attempt=$((attempt+1))
@@ -312,6 +292,8 @@ $WPCLI rewrite flush --hard --quiet
 echo "✔"
 
 echo
-echo "------------------------------------------------------------------"
-echo "                      Installation complete! "
+echo "==================   INSTALLATION COMPLETE !   ==================="
+echo ""
+echo $WPCLI plugin list --status=active
+echo ""
 echo "------------------------------------------------------------------"
