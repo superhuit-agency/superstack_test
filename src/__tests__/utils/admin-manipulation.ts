@@ -87,14 +87,17 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 			}
 		})
 		.catch(() => {
-			console.log(
-				'edit-post-header__settings content:',
-				page.evaluate(
-					() =>
-						document.querySelector('.edit-post-header__settings')
-							?.innerHTML
-				)
-			);
+			page.waitForSelector('.edit-post-header__settings', {
+				timeout: 500,
+			}).then(async (panel) => {
+				if (panel) {
+					console.log(
+						'edit-post-header__settings content:',
+						panel.evaluate((el) => el.innerHTML)
+					);
+				}
+			});
+
 			throw new Error('Right panel button not found');
 		});
 };
