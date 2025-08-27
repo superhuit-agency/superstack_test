@@ -38,7 +38,7 @@ runs:
     - name: Install Puppeteer dependencies
       shell: bash
       run: |
-        sudo apt-get install -y --qq \
+        sudo apt-get install -y -qq \
           libnss3-dev \
           libatk-bridge2.0-dev \
           libdrm-dev \
