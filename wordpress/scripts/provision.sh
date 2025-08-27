@@ -187,7 +187,32 @@ $WPCLI plugin uninstall akismet --deactivate --quiet &> /dev/null
 echo "✔"
 
 echo $en "- Activating plugins $ec"
-$WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --skip-update-check) --quiet &> /dev/null
+echo "  [DEBUG] Available plugins before activation:"
+$WPCLI plugin list --fields=name,status --skip-update-check
+echo "  [DEBUG] Activating inactive plugins..."
+INACTIVE_PLUGINS=$($WPCLI plugin list --status=inactive --field=name --skip-update-check)
+if [ ! -z "$INACTIVE_PLUGINS" ]; then
+	echo "  [DEBUG] Inactive plugins to activate: $INACTIVE_PLUGINS"
+	$WPCLI plugin activate $INACTIVE_PLUGINS --quiet
+else
+	echo "  [DEBUG] No inactive plugins found"
+fi
+echo "  [DEBUG] Plugin status after activation:"
+$WPCLI plugin list --field=name,status --skip-update-check
+
+# Ensure critical SEO and GraphQL plugins are activated
+echo $en "- Ensuring critical SEO/GraphQL plugins are active $ec"
+CRITICAL_PLUGINS="wp-graphql wordpress-seo wp-graphql-yoast-seo"
+for plugin in $CRITICAL_PLUGINS; do
+	if $WPCLI plugin list --name="$plugin" --status=inactive --quiet 2>/dev/null; then
+		echo "  [DEBUG] Activating critical plugin: $plugin"
+		$WPCLI plugin activate "$plugin" --quiet 2>/dev/null || echo "  [WARNING] Failed to activate $plugin"
+	elif $WPCLI plugin list --name="$plugin" --status=active --quiet 2>/dev/null; then
+		echo "  [DEBUG] Plugin $plugin is already active"
+	else
+		echo "  [WARNING] Plugin $plugin not found"
+	fi
+done
 echo "✔"
 
 # Multilang
@@ -294,6 +319,23 @@ echo "✔"
 echo
 echo "==================   INSTALLATION COMPLETE !   ==================="
 echo ""
-echo $WPCLI plugin list --status=active
+echo "Active plugins:"
+echo ""
+$WPCLI plugin list --status=active --fields=name,version,update,update_version --format=table
+echo ""
+
+# Verify GraphQL schema includes SEO field
+echo $en "- Verifying GraphQL SEO integration $ec"
+if curl -s -X POST -H "Content-Type: application/json" \
+   -d '{"query":"query{__schema{queryType{fields{name}}}}"}' \
+   http://localhost/graphql | grep -q '"name":"seo"'; then
+	echo "✔ SEO field is available in GraphQL schema"
+else
+	echo "✗ SEO field NOT found in GraphQL schema"
+	echo "  [DEBUG] Testing basic GraphQL endpoint..."
+	curl -s -X POST -H "Content-Type: application/json" \
+	     -d '{"query":"query{__schema{queryType{fields{name}}}}"}' \
+	     http://localhost/graphql | head -200 || echo "GraphQL endpoint not responding"
+fi
 echo ""
 echo "------------------------------------------------------------------"
