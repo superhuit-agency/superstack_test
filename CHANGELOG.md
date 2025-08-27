@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.2 - 2025-08-27
+
+- [ef48f2e](https://github.com/superhuit-agency/superstack_test/commit/ef48f2e13da3ae5bf7cb88bf87543379f9ff18f2) ci: 🧑‍🔧 Enhanced PR workflows and passing tests 🧪
+
+- Updated github workflows for deployments
+- Documentation about tests and automation
+- Passed validate-pull-request and all endtoend tests (Aurelien Jacquot)
+
+
 ## 1.2.1 - 2025-08-20
 
 - [ecaabe8](https://github.com/superhuit-agency/superstack_test/commit/ecaabe8ca3a2232bcd073494dbe5b26f4f6bd410) Merge remote-tracking branch 'remote/release/v1.1.0' (geck1942)
