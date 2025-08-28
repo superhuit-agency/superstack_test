@@ -125,7 +125,7 @@ jobs:
           NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
           NEXT_URL: ${{ vars.NEXT_URL }}
-          PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}
+          NEXT_RESTART_COMMAND: ${{ vars.NEXT_RESTART_COMMAND }}
           # TODO: Remove this once the @wordpress packages are updated to support React 19
           legacy-peer-deps: true
 

@@ -27,8 +27,8 @@ inputs:
   WORDPRESS_URL:
     description: 'WordPress URL'
     required: true
-  PM2_APP_NAME:
-    description: 'PM2 app name'
+  NEXT_RESTART_COMMAND:
+    description: 'Any command to run on the server after deployment (restart pm2 or anything)'
     required: false
     default: ''
   legacy-peer-deps:
@@ -119,9 +119,7 @@ runs:
         SSH_KEY: ${{ inputs.NEXT_SSH_PRIVATE_KEY }}
 
     - name: Restart PM2 app
-      if: inputs.PM2_APP_NAME != ''
+      if: inputs.NEXT_RESTART_COMMAND != ''
       shell: bash
       run: |
-        ssh ${{ steps.ssh.outputs.SERVER }} \
-           "cd ${{ inputs.NEXT_SSH_PATH }}; \
-           pm2 restart ${{ inputs.PM2_APP_NAME }}"
+        ssh ${{ steps.ssh.outputs.SERVER }} -t "cd ${{ inputs.NEXT_SSH_PATH }}; ${{ inputs.NEXT_RESTART_COMMAND }}"

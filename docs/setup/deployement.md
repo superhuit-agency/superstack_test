@@ -46,6 +46,7 @@ You can for sure define them manually in the Github GUI, but the easiest way to 
 | NEXT_SSH_PORT         | True      | 22                        | The SSH port used for deployment                               |
 | NEXT_SSH_USER         | True      | superstack                | The SSH user used for deployment                               |
 | NEXT_URL              | True      |                           | The URL of the Next Frontend website                           |
+| NEXT_RESTART_COMMAND  | False     |                           | Any command to run on the Next server after deploy             |
 | RELEASE_BELT_USER     | False     |                           | If you have a private source of plugins repository             |
 | WORDPRESS_ADMIN_EMAIL | True      |                           | Your default Wordpress admin email                             |
 | WORDPRESS_ADMIN_USER  | True      | superstack                | Your default Wordpress admin user name                         |
