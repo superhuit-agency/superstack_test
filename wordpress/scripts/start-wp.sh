@@ -10,7 +10,7 @@ echo ""
 echo "=====================   STARTING WORDPRESS   ====================="
 echo ""
 sleep 0.2
-THEME_NAME=${THEME_NAME} $COMPOSE -f docker-compose.yml up "$@" --build -d
+THEME_NAME=${THEME_NAME} $COMPOSE -f docker-compose.yml up "$@" --build -d --quiet-pull
 echo $(docker ps)
 echo ""
 echo "=============   INSTALLING COMPOSER DEPENDENCIES   ==============="

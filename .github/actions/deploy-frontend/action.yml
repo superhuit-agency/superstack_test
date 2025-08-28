@@ -27,6 +27,10 @@ inputs:
   WORDPRESS_URL:
     description: 'WordPress URL'
     required: true
+  PM2_APP_NAME:
+    description: 'PM2 app name'
+    required: false
+    default: ''
   legacy-peer-deps:
     description: 'Install node dependencies with legacy peer dependencies'
     required: true
@@ -104,3 +108,8 @@ runs:
         SOURCE: './wordpress/package.json ./wordpress/package-lock.json'
         TARGET: ${{ inputs.NEXT_SSH_PATH }}/wordpress/
         EXCLUDE: ''
+
+    - name: Restart PM2 app
+      if: inputs.PM2_APP_NAME != ''
+      shell: bash
+      run: pm2 restart ${{ inputs.PM2_APP_NAME }}
