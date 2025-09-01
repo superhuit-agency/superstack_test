@@ -6,3 +6,4 @@ export { SectionEdit } from './SectionEdit';
 export { IdControl } from './Inputs/IdControl';
 export { NameControl } from './Inputs/NameControl';
 export { PreviewBlockImage } from './PreviewBlockImage';
+export { EditWithPreview } from './EditWithPreview';

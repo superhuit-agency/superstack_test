@@ -14,7 +14,7 @@ In here any WP component from their library can be used. [See the list of compon
 
 ### Custom components
 
--   `PostsSelectControl` → To select a list of Posts from a specific Post Type
+- `PostsSelectControl` → To select a list of Posts from a specific Post Type
 
     ```tsx
     <PostsSelectControl
@@ -29,7 +29,7 @@ In here any WP component from their library can be used. [See the list of compon
 
     <br />
 
--   `TermsSelectControl` → To select a list of Taxonomies from a specific Taxonomy Type
+- `TermsSelectControl` → To select a list of Taxonomies from a specific Taxonomy Type
 
     ```tsx
     <TermsSelectControl
@@ -48,11 +48,11 @@ You can convert any frontend static block into an editable block within WP Edito
 
 ### Wordpress Components
 
--   `RichText` → to enter some text [(📚 more infos here)](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/richtext.md)
+- `RichText` → to enter some text [(📚 more infos here)](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/richtext.md)
 
 ### Custom components
 
--   `ImageEdit` → to add an image
+- `ImageEdit` → to add an image
 
     ```tsx
     <ImageEdit
@@ -65,7 +65,7 @@ You can convert any frontend static block into an editable block within WP Edito
     />
     ```
 
--   `VideoEdit` → to add a video (from YouTube or Vimeo)
+- `VideoEdit` → to add a video (from YouTube or Vimeo)
 
     _/!\ `video`'s value cannot be undefined -- it must be an object by default_
 
@@ -81,7 +81,7 @@ You can convert any frontend static block into an editable block within WP Edito
     />
     ```
 
--   `CharacterLimit` → to add a limit of characters on any text. (📚 [more infos here](../../wordpress/theme/lib/editor/components/CharacterLimit/README.md))
+- `CharacterLimit` → to add a limit of characters on any text. (📚 [more infos here](../../wordpress/theme/lib/editor/components/CharacterLimit/README.md))
 
     ```tsx
     <CharacterLimit
@@ -95,7 +95,7 @@ You can convert any frontend static block into an editable block within WP Edito
     />
     ```
 
--   `SectionEdit.Uptitle`, `SectionEdit.Title`, `SectionEdit.Introduction` → to handle Sections uptitle, title and/or introduction (📚 [more infos here](../features/helpers.md))
+- `SectionEdit.Uptitle`, `SectionEdit.Title`, `SectionEdit.Introduction` → to handle Sections uptitle, title and/or introduction (📚 [more infos here](../features/helpers.md))
 
 ## InnerBlocks
 
@@ -150,8 +150,20 @@ Everything which is inside `<BlockControls />` is going to be displayed on the t
 
 ## WP Blocks Inserter
 
-If you want to display a preview of your block when hovering it on the WP Inserter, we've created the `<PreviewBlockImage />` component that will automatically look for a `.jpg` image in the `wordpress/theme/lib/editor/blocks-preview` folder. The name of the image should be the slugified slug of your block. For example, for `supt/my-block` you will need to add the `supt-my-block.jpg` image of your block.
+If you want to display a **preview** of your block when hovering it on the WP Inserter, we've created the `<PreviewBlockImage />` component that will automatically look for a `.jpg` image in the `wordpress/theme/lib/editor/blocks-preview` folder. The name of the image should be the slugified slug of your block. For example, for `supt/my-block` you will need to add the `supt-my-block.jpg` image of your block.
+
+### Usage
+
+We've created the Higher Order Component `<EditWithPreview />` to have the preview without adding too much code. To use it, you just need to wrap the `Edit` of your block like below :
+
+```tsx
+export const MyBlock = {
+  ...
+  edit: (props: WpBlockEditProps<MyBlockAttributes>) =>
+			EditWithPreview({ Edit, ...props }),
+}
+```
 
 ## 🔗 Further reading and resources
 
--   [WP documentation of a block in the Editor](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-in-the-editor/)
+- [WP documentation of a block in the Editor](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-in-the-editor/)
