@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/components/atoms/Link';
+import { rootBlocksList } from '@/components/root-block-lists';
 import { Blocks, Container } from '@/components/global';
 import { SectionNews, Image, Button } from '@/components';
 
@@ -83,6 +84,7 @@ export default function Post({ node }: any) {
 					) : null}
 					<div className="supt-single-post__content">
 						<Blocks
+							blocksList={rootBlocksList}
 							blocks={node.blocksJSON}
 							excludes={/^supt\/page-header/g}
 						/>

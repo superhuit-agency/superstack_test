@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/components/atoms/Link';
 import { Blocks, Container } from '@/components/global';
+import { rootBlocksList } from '@/components/root-block-lists';
 import { Pagination, Button, CardNews } from '@/components';
 
 import './styles.css';
@@ -40,7 +41,11 @@ export default function Page({ node }: ArchivePostProps) {
 
 	return (
 		<>
-			<Blocks blocks={node.blocksJSON} includes={/page-header/g} />
+			<Blocks
+				blocksList={rootBlocksList}
+				blocks={node.blocksJSON}
+				includes={/page-header/g}
+			/>
 			<Container className="supt-archive-post supt-section">
 				<div className="supt-archive-post__inner">
 					{/* list categories */}
@@ -105,6 +110,7 @@ export default function Page({ node }: ArchivePostProps) {
 					) : null}
 
 					<Blocks
+						blocksList={rootBlocksList}
 						blocks={node.blocksJSON as BlockPropsType[]}
 						excludes={/page-header/g}
 					/>
