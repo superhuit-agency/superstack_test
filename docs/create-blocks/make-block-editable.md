@@ -25,9 +25,9 @@ In here any WP component from their library can be used. [See the list of compon
     />
     ```
 
-    <img src="../assets/posts-select-control.jpg" alt="Posts Select Control Design" width="300">
+      <img src="../assets/posts-select-control.jpg" alt="Posts Select Control Design" width="300">
 
-    <br />
+      <br />
 
 - `TermsSelectControl` → To select a list of Taxonomies from a specific Taxonomy Type
 
@@ -40,7 +40,7 @@ In here any WP component from their library can be used. [See the list of compon
     />
     ```
 
-    <img src="../assets/terms-select-control.jpg" alt="Terms Select Control Design" width="300">
+      <img src="../assets/terms-select-control.jpg" alt="Terms Select Control Design" width="300">
 
 ## Edit from WP Editor
 
@@ -81,12 +81,12 @@ You can convert any frontend static block into an editable block within WP Edito
     />
     ```
 
-- `CharacterLimit` → to add a limit of characters on any text. (📚 [more infos here](../../wordpress/theme/lib/editor/components/CharacterLimit/README.md))
+- `RichTextWithLimit` → to add a limit of characters on a RichText. (📚 [more infos here](../../wordpress/theme/lib/editor/components/RichTextWithLimit/README.md))
 
     ```tsx
-    <CharacterLimit
-    	value={title}
+    <RichTextWithLimit
     	limit={140}
+    	value={title}
     	onChange={(title) =>
     		props.setAttributes({
     			title,
