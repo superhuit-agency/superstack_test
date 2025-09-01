@@ -20,8 +20,8 @@ export const Default: Story = {
 	args: {
 		children: (
 			<>
-				<Button text="Button 1" url="#" />,
-				<Button text="Button 2" url="#" variant="secondary" />,
+				<Button text="Button 1" url="#" />
+				<Button text="Button 2" url="#" variant="secondary" />
 			</>
 		),
 	},

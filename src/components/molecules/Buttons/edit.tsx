@@ -44,6 +44,7 @@ const withCustomPostTypesSetting = (
 	settings['postTypes'] = ['post', 'page'];
 
 	// Remove layout controls in sidebar
+	// @ts-expect-error
 	settings.supports = {
 		...settings.supports,
 		align: false,

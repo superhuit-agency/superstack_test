@@ -33,30 +33,30 @@ export const Secondary: Story = {
 export const Submit: Story = {
 	args: {
 		type: 'submit',
-		title: 'Submit Form',
+		text: 'Submit Form',
 	},
 };
 
 export const Download: Story = {
 	args: {
 		download: true,
-		title: 'Download file',
-		href: '/file.pdf',
+		text: 'Download file',
+		url: '/file.pdf',
 	},
 };
 
 export const External: Story = {
 	args: {
-		title: 'Made by Superhuit',
-		href: 'https://superhuit.ch',
+		text: 'Made by Superhuit',
+		url: 'https://superhuit.ch',
 		target: '_blank',
 	},
 };
 
 export const Empty: Story = {
 	args: {
-		title: undefined,
-		href: 'https://superhuit.ch',
+		text: undefined,
+		url: 'https://superhuit.ch',
 		target: '_blank',
 	},
 };
