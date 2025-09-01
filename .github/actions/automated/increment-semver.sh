@@ -22,9 +22,15 @@ done
 
 # Extract the current version using awk
 # Try to extract version with quotes first, then without quotes if not found
+# This line extracts the version number from a JSON file (like package.json)
+# -F'"' sets the field separator to double quotes
+# /"version":/ searches for lines containing "version":
+# {print $4; exit} prints the 4th field (the version number) and exits
+# Example: if line is   "version": "1.2.3",
+# Fields are: 1:"" 2:version 3:"" 4:1.2.3
 current_version=$(awk -F'"' '/"version":/ {print $4; exit}' $file_path)
 if [ -z "$current_version" ]; then
-    current_version=$(awk '/Version:/ {print $4; exit}' $file_path)
+    current_version=$(awk -F': ' '/Version:/ {print $2; exit}' $file_path)
 fi
 
 if [ -z "$current_version" ]; then
