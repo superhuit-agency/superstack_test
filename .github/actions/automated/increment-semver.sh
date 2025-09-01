@@ -21,7 +21,11 @@ do
 done
 
 # Extract the current version using awk
+# Try to extract version with quotes first, then without quotes if not found
 current_version=$(awk -F'"' '/"version":/ {print $4; exit}' $file_path)
+if [ -z "$current_version" ]; then
+    current_version=$(awk '/Version:/ {print $2; exit}' $file_path)
+fi
 
 if [ -z "$current_version" ]; then
 	echo "Version not found in $file_path"
