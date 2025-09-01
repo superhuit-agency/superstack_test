@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 - 2025-08-18: Update to WP 6.8 + Next 15 + React 19 + Node 22
+## 1.1.0 - 2025-08-18: Update to WP 6.8 + Next 15 + React 19 + Node 22
 
 This major update brings significant version upgrades across the entire stack, ensuring compatibility with the latest technologies while maintaining stability and performance.
 
@@ -23,13 +23,7 @@ This major update brings significant version upgrades across the entire stack, e
 - Enhanced Vercel deployment with CLI integration ([97dc5fa](https://github.com/superhuit-agency/superstack_test/commit/97dc5fa))
 - Improved block whitelisting functionality ([11c57f7](https://github.com/superhuit-agency/superstack_test/commit/11c57f7))
 
-## 1.1.1 - 2025-08-18
-
-- Added back the Vercel deployment github action.
-- Reverted unused deprecated package.
-- Fixed readme file
-
-## 1.1.0 - 2025-07-28: Automated tests with Jest
+### 🧪 Tests
 
 Automated tests added using the `npm run test:all` command. Jest packages were added and configured.
 Github workflows were changed to enable automatic testing upon pull requests and automatic versioning upon changes on the main branch.
