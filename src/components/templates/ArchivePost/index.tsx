@@ -30,8 +30,8 @@ export default function Page({ node }: ArchivePostProps) {
 	const allCategories = useMemo(() => {
 		return [
 			{
-				title: dictionary.archivePost?.all,
-				href: baseUri,
+				text: dictionary.archivePost?.all,
+				url: baseUri,
 				isActive: baseUri === node.uri,
 			},
 			...categories,
